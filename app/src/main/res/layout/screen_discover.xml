@@ -1,28 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5">
+
 
     <LinearLayout
         android:id="@+id/top_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="20dp"
+        android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp">
+
 
         <EditText
             android:id="@+id/search_bar"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="50dp"
             android:hint="Search"
-            android:textSize="16sp"
             android:paddingStart="15dp"
             android:drawableStart="@android:drawable/ic_menu_search"
-            android:background="@drawable/search_bar" />
+            android:background="@android:drawable/editbox_background" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,12 +62,12 @@
         </LinearLayout>
     </LinearLayout>
 
-
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="@android:color/darker_gray"
-        android:layout_below="@id/top_section"/>
+        android:layout_below="@id/top_section"
+        />
 
 
     <ScrollView
@@ -91,7 +96,7 @@
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
                     android:background="#D3D3D3"
-                    android:src="@drawable/gallery"/>
+                    android:src="@drawable/ic_gallery"/>
 
                 <LinearLayout
                     android:id="@+id/text_section"
@@ -134,7 +139,7 @@
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
                     android:background="#B0C4DE"
-                    android:src="@drawable/gallery"/>
+                    android:src="@drawable/ic_gallery"/>
 
                 <LinearLayout
                     android:id="@+id/second_text_section"
@@ -177,7 +182,7 @@
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
                     android:background="#B0C4DE"
-                    android:src="@drawable/gallery"/>
+                    android:src="@drawable/ic_gallery"/>
 
                 <LinearLayout
                     android:id="@+id/third_text_section"
@@ -212,57 +217,150 @@
 
     </ScrollView>
 
-
     <RelativeLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:background="@android:color/white"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+        android:paddingRight="10dp"
+        android:layout_marginBottom="10dp">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:background="@android:color/darker_gray"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true"
+            />
 
         <LinearLayout
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center">
 
-            <ImageView
+            <LinearLayout
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/shaded"
-                android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+
+                <ImageView
+                    android:id="@+id/discover_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_magnifying_glass"
+                    android:contentDescription="Discover"
+                    />
+
+                <TextView
+                    android:id="@+id/discover_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Discover"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/wishlist_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_heart"
+                    android:contentDescription="Wishlist"/>
+
+                <TextView
+                    android:id="@+id/wishlist_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Wishlist"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/empty"
-                android:layout_weight="1"/>
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/logo"
+                android:layout_weight="1"
+                app:tint="@color/black"
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <ImageView
+            <LinearLayout
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/empty"
-                android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
 
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/empty"
-                android:layout_weight="1"/>
+                <ImageView
+                    android:id="@+id/messages_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_message"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Messages"
+                    app:tint="@color/black"/>
 
-            <ImageView
+                <TextView
+                    android:id="@+id/messages_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Messages"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/empty"
-                android:layout_weight="1"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+
+
+                <ImageView
+                    android:id="@+id/profile_button"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_user"
+                    app:tint="@color/black"
+                    android:contentDescription="Profile"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:id="@+id/profile_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
         </LinearLayout>
     </RelativeLayout>
 

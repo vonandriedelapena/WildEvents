@@ -9,7 +9,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="30dp"
-        android:src="@drawable/wildeventslogo"
+        android:src="@drawable/logo"
         />
 
     <LinearLayout
@@ -171,7 +171,7 @@
             android:textColor="@color/black"
             android:textSize= "16sp"
             android:layout_gravity="center"
-            android:background="@drawable/select_button"
+            android:background="@drawable/button_select"
             />
         <Button
             android:id="@+id/btnStudent"
@@ -184,7 +184,7 @@
             android:textColor="@color/black"
             android:textSize= "16sp"
             android:layout_gravity="center"
-            android:background="@drawable/select_button"
+            android:background="@drawable/button_select"
             />
 
 

@@ -9,7 +9,7 @@
         android:layout_height="120dp"
         android:layout_gravity="center"
         android:layout_marginTop="60dp"
-        android:src="@drawable/wildeventslogo"
+        android:src="@drawable/logo"
         />
     <TextView
         android:layout_marginTop="80dp"
@@ -35,7 +35,7 @@
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />
-        />
+    />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />
-        />
+    />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -70,7 +70,7 @@
             android:layout_height="20dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="5dp"
-            android:button="@drawable/checkbox"
+            android:button="@drawable/button_checkbox"
             />
 
         <TextView
@@ -80,7 +80,7 @@
             android:text="Remember me"
             android:layout_weight="1"
             android:textSize="14sp"
-        />
+            />
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
             android:id="@+id/goToSignup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:text="@string/sign_up"
             android:textColor="#800000"
             android:layout_weight=".2"
