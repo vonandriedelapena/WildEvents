@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="30dp"
+        android:src="@drawable/wildeventslogo"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
+        >
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="7dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:text="First name"
+                />
+            <EditText
+                android:id="@+id/firstName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                android:hint=""
+                android:textColor="#333333"
+                android:background="@drawable/edittext_background"
+                android:padding="3dp"
+                android:textSize="14sp"
+                android:inputType="textPassword"
+                android:maxLength="100" />
+            />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="7dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:text="Last name"
+                />
+            <EditText
+                android:id="@+id/lastName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                android:hint=""
+                android:textColor="#333333"
+                android:background="@drawable/edittext_background"
+                android:padding="3dp"
+                android:textSize="14sp"
+                android:inputType="textPassword"
+                android:maxLength="100" />
+            />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textColor="#000"
+        android:textSize="14sp"
+        android:text="Email"
+        />
+    <EditText
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="0dp"
+        android:hint=""
+        android:textColor="#333333"
+        android:background="@drawable/edittext_background"
+        android:padding="3dp"
+        android:textSize="14sp"
+        android:inputType="textEmailAddress"
+        android:maxLength="100" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:textColor="#000"
+        android:textSize="14dp"
+        android:text="Password"
+        />
+    <EditText
+        android:id="@+id/passwordRegister"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="0dp"
+        android:hint=""
+        android:textColor="#333333"
+        android:background="@drawable/edittext_background"
+        android:padding="3dp"
+        android:textSize="14sp"
+        android:inputType="textPassword"
+        android:maxLength="100" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:textColor="#000"
+        android:textSize="14sp"
+        android:text="Confirm Password"
+        />
+    <EditText
+        android:id="@+id/confirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="0dp"
+        android:hint=""
+        android:textColor="#333333"
+        android:background="@drawable/edittext_background"
+        android:padding="3dp"
+        android:textSize="14sp"
+        android:inputType="textPassword"
+        android:maxLength="100" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp">
+
+        <Button
+            android:id="@+id/btnHost"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="7dp"
+            android:layout_height="80dp"
+            android:text="Host"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize= "16sp"
+            android:layout_gravity="center"
+            android:background="@drawable/select_button"
+            />
+        <Button
+            android:id="@+id/btnStudent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="7dp"
+            android:layout_height="80dp"
+            android:text="Student"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize= "16sp"
+            android:layout_gravity="center"
+            android:background="@drawable/select_button"
+            />
+
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSignup"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="Sign up"
+        android:textColor="@color/white"
+        android:textSize= "18sp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:textAllCaps="false"
+        android:background="@drawable/button_background"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="27dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="20dp"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? "
+            android:layout_weight=".48"
+            android:textSize="14sp"
+            android:textColor="#000"
+            android:textAlignment="textEnd"
+            />
+        <TextView
+            android:id="@+id/goToLogin"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#800000"
+            android:text="log in"
+            android:layout_weight=".2"
+            />
+    </LinearLayout>
+</LinearLayout>
