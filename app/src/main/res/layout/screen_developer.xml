@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Fixed Header (Toolbar) -->
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
