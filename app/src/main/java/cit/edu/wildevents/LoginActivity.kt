@@ -1,6 +1,5 @@
 package cit.edu.wildevents
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +7,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 
-class LoginActivity : Activity() {
+class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.screen_login)
@@ -19,7 +19,8 @@ class LoginActivity : Activity() {
         val password = findViewById<EditText>(R.id.edittext_password)
 
         val registerScreen = Intent(this, RegisterActivity::class.java)
-        val discoverScreen = Intent(this, DiscoverActivity::class.java)
+        //val discoverScreen = Intent(this, DiscoverActivity::class.java)
+        val mainScreen = Intent(this, MainActivity::class.java)
 
         val buttonLogin = findViewById<Button>(R.id.button_login)
         buttonLogin.setOnClickListener {
@@ -32,7 +33,7 @@ class LoginActivity : Activity() {
                 Toast.makeText(this, "Successful login", Toast.LENGTH_LONG).show()
                 Log.e("Mob Dev", "Button login is clicked")
                 Toast.makeText(this, "Button login is clicked", Toast.LENGTH_LONG).show()
-                startActivity(discoverScreen)
+                startActivity(mainScreen)
             }
             else {
                 Toast.makeText(this, "Invalid credentials", Toast.LENGTH_LONG).show()
