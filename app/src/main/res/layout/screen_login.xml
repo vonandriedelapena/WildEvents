@@ -32,6 +32,7 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />
@@ -56,6 +57,7 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />
