@@ -77,7 +77,7 @@
                     android:layout_height="300dp"
                     android:scaleType="centerCrop"
                     android:background="@drawable/background_image"
-                    android:src=""
+                    android:src="@drawable/img_dev1"
                     android:clipToOutline="true" />
 
                 <TextView
@@ -165,7 +165,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Passionate Java developer working on an event lister app using JavaFX. Loves problem-solving, clean code, and creating seamless user experiences. When not coding, enjoys reading manga. Fueled by Sting energy drinks!"
+                    android:text="Java developer passionate about creating intuitive and efficient applications with JavaFX. Enjoys solving complex problems, writing clean code, and enhancing user experiences. Outside of coding, has a love for traveling and driving!"
                     android:textSize="12sp"
                     android:textColor="#666666"
                     android:paddingBottom="14dp" />
