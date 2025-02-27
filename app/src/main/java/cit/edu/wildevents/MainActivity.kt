@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
         // Load default fragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileFragment())
+                .replace(R.id.fragment_container, DiscoverFragment())
                 .commit()
         }
 

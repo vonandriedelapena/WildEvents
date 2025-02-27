@@ -16,7 +16,15 @@
 
     <string name="log_in">
     <u>Log in</u>
-</string>
+    </string>
+
+    <string name="log_out">
+    <u>Log out</u>
+    </string>
+
+    <string name="edit">
+    <u>Edit</u>
+    </string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
