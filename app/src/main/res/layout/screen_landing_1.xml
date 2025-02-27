@@ -1,110 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="#F5F5F5"
+    android:padding="20dp">
 
-    <!-- Top Section -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:src="@drawable/logo"
+        android:contentDescription="App Logo" />
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to WildEvents! 🎉"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_below="@id/logoImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id="@+id/subtitleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Discover amazing events, connect with your community, and never miss out on the fun!"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_below="@id/welcomeText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center" />
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
+        android:id="@+id/featuresLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:layout_below="@id/subtitleText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
-            android:layout_height="250dp"
-            android:scaleType="fitCenter"
-            android:background="#CBD2E0"
-            android:src="@drawable/ic_gallery" />
+            android:layout_height="wrap_content"
+            android:text="✅ Explore trending events"
+            android:textSize="14sp"
+            android:textColor="#444444"
+            android:layout_marginBottom="8dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✅ Filter events by type for easy discovery"
+            android:textSize="14sp"
+            android:textColor="#444444"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✅ Seamlessly RSVP and stay updated"
+            android:textSize="14sp"
+            android:textColor="#444444" />
     </LinearLayout>
 
-    <!-- Bottom Section -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:background="@drawable/background_rounded"
-        android:padding="20dp"
-        android:gravity="center">
+    <Button
+        android:id="@+id/getStartedButton"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Get Started"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:layout_below="@id/featuresLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:padding="10dp"
+        android:gravity="center"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/button_background"/>
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Explore Upcoming and Nearby Events"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp" />
-
-        <!-- Description -->
-        <TextView
-            android:id="@+id/descriptionText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="In publishing and graphic design, Lorem is a placeholder text commonly"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:layout_below="@id/titleText"
-            android:layout_marginTop="10dp"
-            android:textAlignment="center" />
-
-        <!-- Navigation Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Skip"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:layout_marginEnd="40dp" />
-
-            <!-- Dots Indicator -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/selector_dot"
-                    android:layout_margin="4dp" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/selector_dot"
-                    android:layout_margin="4dp" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="8dp"
-                    android:background="@drawable/selector_dot"
-                    android:layout_margin="4dp" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Next"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:layout_marginStart="40dp" />
-        </LinearLayout>
-    </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>
