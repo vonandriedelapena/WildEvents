@@ -6,77 +6,114 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".DiscoverFragment">
-    
+
+    <!-- Main Container -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5F5F5">
+        android:background="#ECECEC">
 
-
+        <!-- Top Section -->
         <LinearLayout
             android:id="@+id/top_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp">
+            android:background="@drawable/top_section_bg"
+            android:elevation="8dp">
 
-
+            <!-- Search Bar -->
             <EditText
-                android:inputType="text"
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="60dp"
                 android:hint="Search"
                 android:paddingStart="15dp"
+                android:textSize="16sp"
+                android:layout_margin="10dp"
+                android:background="@drawable/disc_rounded"
                 android:drawableStart="@android:drawable/ic_menu_search"
-                android:background="@android:drawable/editbox_background" />
+                android:drawableTint="@color/black"
+                android:elevation="6dp"/>
 
-
-            <LinearLayout
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="10dp">
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="5dp"
+                android:scrollbars="none">
 
-                <Button
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ctgy1"
-                    android:layout_weight="1"/>
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="5dp">
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ctgy2"
-                    android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="General"
+                        android:background="@drawable/category_background"
+                        android:backgroundTint="#FFFFFF"
+                        android:textColor="@color/white"
+                        android:layout_marginEnd="10dp"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ctgy3"
-                    android:layout_weight="1"/>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ENGR"
+                        android:background="@drawable/category_background"
+                        android:textColor="@color/white"
+                        android:layout_marginEnd="10dp"/>
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ctgy4"
-                    android:layout_weight="1"/>
-            </LinearLayout>
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ARCH"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CNAHS"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CCS"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CRIM"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CMBA"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OTHERS"
+                        android:background="@drawable/category_background"
+                        android:layout_marginEnd="10dp"/>
+                </LinearLayout>
+            </HorizontalScrollView>
+
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"
-            android:layout_below="@id/top_section"
-            />
-
 
         <ScrollView
             android:id="@+id/scrollView"
@@ -91,134 +128,131 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- First Event -->
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="25dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/card_rounded"
+                    android:padding="16dp"
+                    android:layout_marginBottom="20dp">
 
                     <ImageView
-                        android:id="@+id/main_image"
+                        android:id="@+id/profile_image1"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="200dp"
                         android:scaleType="centerCrop"
-                        android:background="#D3D3D3"
-                        android:src="@drawable/ic_gallery"/>
+                        android:src="@drawable/img_event1"
+                        android:background="@drawable/rounded_image"
+                        android:clipToOutline="true"/>
 
-                    <LinearLayout
-                        android:id="@+id/text_section"
-                        android:layout_width="match_parent"
+
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_below="@id/main_image"
-                        android:layout_marginTop="10dp">
+                        android:text="INTRAMSURALS 2025: CLASH OF CELESTIAL REALMS"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:paddingTop="10dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Title"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12-15 March, 25"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:paddingBottom="4dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Subtitle"
-                            android:textSize="14sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="The celestial realms awaken, and the stars have set the stage for the ultimate clash."
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Description text goes here."
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                </LinearLayout>
 
-                <!-- Second Event -->
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="25dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/card_rounded"
+                    android:padding="16dp"
+                    android:layout_marginBottom="20dp">
 
                     <ImageView
-                        android:id="@+id/second_image"
+                        android:id="@+id/profile_image2"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="200dp"
                         android:scaleType="centerCrop"
-                        android:background="#B0C4DE"
-                        android:src="@drawable/ic_gallery"/>
+                        android:src="@drawable/img_event2"
+                        android:background="@drawable/rounded_image"
+                        android:clipToOutline="true"/>
 
-                    <LinearLayout
-                        android:id="@+id/second_text_section"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_below="@id/second_image"
-                        android:layout_marginTop="10dp">
+                        android:text="LIKHA: THE GRANDEST FINALE"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:paddingTop="10dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Second Event"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 March, 25"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:paddingBottom="4dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Another Subtitle"
-                            android:textSize="14sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Are you ready? The grandest night of Intramurals 2025 is here!"
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="More description about the second event."
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                </LinearLayout>
 
-                <!-- Third Event -->
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="25dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/card_rounded"
+                    android:padding="16dp">
 
                     <ImageView
-                        android:id="@+id/third_image"
+                        android:id="@+id/profile_image3"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
+                        android:layout_height="200dp"
                         android:scaleType="centerCrop"
-                        android:background="#B0C4DE"
-                        android:src="@drawable/ic_gallery"/>
+                        android:src="@drawable/img_event3"
+                        android:background="@drawable/rounded_image"
+                        android:clipToOutline="true"/>
 
-                    <LinearLayout
-                        android:id="@+id/third_text_section"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_below="@id/third_image"
-                        android:layout_marginTop="10dp">
+                        android:text="CCS: ACQUAIANTANCE PARTY"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:paddingTop="10dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="third Event"
-                            android:textSize="18sp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 March, 25"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:paddingBottom="4dp" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Another Subtitle"
-                            android:textSize="14sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Get ready to rewind time as we teleport you to an era of glitter, disco balls, and neon dreams!"
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="More description about the second event."
-                            android:textSize="14sp"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                </LinearLayout>
 
             </LinearLayout>
 

@@ -212,7 +212,8 @@
                 <include layout="@layout/settings_button_translation" android:id="@+id/taxes" android:text="Taxes"/>
                 <include layout="@layout/settings_button_notifications" android:id="@+id/translation" android:text="Translation"/>
                 <include layout="@layout/settings_button_privacy_and_sharing" android:id="@+id/notifications" android:text="Notifications"/>
-                <include layout="@layout/settings_button_logout" />
+                <include layout="@layout/settings_button_about_developers" android:id="@+id/about_developers"/>
+                <include layout="@layout/settings_button_logout" android:id="@+id/logout_button"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

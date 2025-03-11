@@ -13,6 +13,12 @@
         android:theme="@style/Theme.WildEvents"
         tools:targetApi="31">
         <activity
+            android:name=".EditPersonalInfoActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".SettingsAboutDevelopers"
+            android:exported="false"/>
+        <activity
             android:name=".SettingsProfileView"
             android:exported="false"/>
         <activity

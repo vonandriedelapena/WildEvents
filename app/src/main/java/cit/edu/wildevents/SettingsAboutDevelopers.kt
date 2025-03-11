@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 
-class SettingsProfileView : AppCompatActivity() {
+class SettingsAboutDevelopers : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_profile_view)
+        setContentView(R.layout.screen_developer)
 
         val goToMainActivity = findViewById<ImageView>(R.id.back_button)
         goToMainActivity.setOnClickListener {

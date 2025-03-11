@@ -42,8 +42,8 @@
                 android:textColor="#333333"
                 android:background="@drawable/edittext_background"
                 android:padding="3dp"
+                android:paddingStart="15dp"
                 android:textSize="14sp"
-                android:inputType="textPassword"
                 android:maxLength="100" />
             />
         </LinearLayout>
@@ -71,8 +71,8 @@
                 android:textColor="#333333"
                 android:background="@drawable/edittext_background"
                 android:padding="3dp"
+                android:paddingStart="15dp"
                 android:textSize="14sp"
-                android:inputType="textPassword"
                 android:maxLength="100" />
             />
         </LinearLayout>
@@ -98,6 +98,7 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
         android:inputType="textEmailAddress"
         android:maxLength="100" />
@@ -124,6 +125,7 @@
         android:background="@drawable/edittext_background"
         android:padding="3dp"
         android:textSize="14sp"
+        android:paddingStart="15dp"
         android:inputType="textPassword"
         android:maxLength="100" />
 
@@ -148,6 +150,7 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />
@@ -160,7 +163,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnHost"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -173,7 +176,7 @@
             android:layout_gravity="center"
             android:background="@drawable/button_select"
             />
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnStudent"
             android:layout_width="0dp"
             android:layout_weight="1"

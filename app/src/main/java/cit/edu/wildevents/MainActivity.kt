@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private fun switchFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null) // Add this line to retain fragment state
             .commit()
     }
 }

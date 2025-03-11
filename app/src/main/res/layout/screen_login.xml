@@ -21,7 +21,7 @@
         android:text="Email"
         />
     <EditText
-        android:id="@+id/edittext_username"
+        android:id="@+id/edittext_email"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="20dp"
@@ -32,8 +32,8 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
-        android:inputType="textPassword"
         android:maxLength="100" />
     />
     <TextView
@@ -56,6 +56,7 @@
         android:textColor="#333333"
         android:background="@drawable/edittext_background"
         android:padding="3dp"
+        android:paddingStart="15dp"
         android:textSize="14sp"
         android:inputType="textPassword"
         android:maxLength="100" />

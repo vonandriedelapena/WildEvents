@@ -6,7 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class PersonalInfoAdapter(private val items: List<PersonalInfoItem>) : RecyclerView.Adapter<PersonalInfoAdapter.ViewHolder>() {
+class PersonalInfoAdapter(
+    private val items: List<PersonalInfoItem>,
+    private val onEditClick: (PersonalInfoItem) -> Unit
+) : RecyclerView.Adapter<PersonalInfoAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.title)
@@ -15,7 +18,8 @@ class PersonalInfoAdapter(private val items: List<PersonalInfoItem>) : RecyclerV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.settings_personal_info_name, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.settings_personal_info_name, parent, false)
         return ViewHolder(view)
     }
 
@@ -26,7 +30,7 @@ class PersonalInfoAdapter(private val items: List<PersonalInfoItem>) : RecyclerV
         holder.editButton.visibility = if (item.isEditable) View.VISIBLE else View.GONE
 
         holder.editButton.setOnClickListener {
-            // Handle edit action here
+            onEditClick(item) // Pass clicked item to callback
         }
     }
 
