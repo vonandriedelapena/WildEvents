@@ -1,10 +1,13 @@
 package cit.edu.wildevents
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import com.csit284.myapplication.utils.toast
 
 /*
 * This activity displays the developers of the app and their skills.
@@ -42,6 +45,34 @@ class SettingsAboutDevelopers : AppCompatActivity() {
 
         lvSkills2.adapter = arrayAdapter2
         setListViewHeightBasedOnChildren(lvSkills2)
+
+        // Reveal a toast message when an item is clicked
+        lvSkills1.setOnItemClickListener{ _, _, position, _ ->
+            toast("Von's Skill: ${developer1Skills[position]}")
+        }
+
+        lvSkills2.setOnItemClickListener{ _, _, position, _ ->
+            toast("Reynald's Skill: ${developer2Skills[position]}")
+        }
+
+        // Open a google search about the skill when it is long clicked
+        lvSkills1.setOnItemLongClickListener { _, _, position, _ ->
+            val skill = developer1Skills[position]
+            val url = "https://www.google.com/search?q=$skill"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+            true
+        }
+
+        lvSkills2.setOnItemLongClickListener { _, _, position, _ ->
+            val skill = developer2Skills[position]
+            val url = "https://www.google.com/search?q=$skill"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+            true
+        }
     }
 
     /*
