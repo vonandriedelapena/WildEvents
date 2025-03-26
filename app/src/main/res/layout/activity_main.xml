@@ -6,14 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Fragment Container -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/navigation_bar" />
 
-    <!-- Bottom Navigation Bar (Fixed) -->
     <RelativeLayout
         android:id="@+id/navigation_bar"
         android:layout_width="match_parent"
@@ -33,6 +31,7 @@
             android:gravity="center">
 
             <LinearLayout
+                android:id="@+id/nav_discover_layout"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -46,7 +45,9 @@
                     android:layout_height="30dp"
                     android:src="@drawable/ic_magnifying_glass"
                     android:contentDescription="Discover"
-                    />
+                    app:tint="@drawable/icon_selector"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <TextView
                     android:id="@+id/discover_label"
@@ -54,13 +55,14 @@
                     android:layout_height="wrap_content"
                     android:text="Discover"
                     android:textSize="12sp"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_selector"
                     android:gravity="center"
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
 
 
             <LinearLayout
+                android:id="@+id/wishList_layout"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -94,7 +96,9 @@
                 android:clickable="true"
                 android:focusable="true"/>
 
+
             <LinearLayout
+                android:id="@+id/messages_layout"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -122,7 +126,10 @@
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
 
+
+
             <LinearLayout
+                android:id="@+id/nav_profile_layout"
                 android:layout_width="30dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
