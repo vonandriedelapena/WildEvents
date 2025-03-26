@@ -16,7 +16,7 @@ class DiscoverFragment : Fragment() {
         val eventListView: ListView = view.findViewById(R.id.events_list_view)
 
         val events = listOf(
-            Event("INTRAMSURALS 2025: CLASH OF CELESTIAL REALMS", "12-15 March, 25",
+            Event("INTRAMURALS 2025: CLASH OF CELESTIAL REALMS", "12-15 March, 25",
                 "The celestial realms awaken, and the stars have set the stage for the ultimate clash.", R.drawable.img_event1),
             Event("LIKHA: THE GRANDEST FINALE", "15 March, 25",
                 "Are you ready? The grandest night of Intramurals 2025 is here!", R.drawable.img_event2),

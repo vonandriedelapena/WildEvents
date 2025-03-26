@@ -34,7 +34,9 @@
         android:padding="3dp"
         android:paddingStart="15dp"
         android:textSize="14sp"
-        android:maxLength="100" />
+        android:maxLength="100"
+        android:imeOptions="actionNext"
+        android:inputType="text"/>
     />
     <TextView
         android:layout_width="wrap_content"

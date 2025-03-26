@@ -19,7 +19,7 @@ class SettingsAboutDevelopers : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.screen_developer)
 
-        /** This goes back to the previous fragment without recreating MainActivity. */
+        /* This goes back to the previous fragment without recreating MainActivity. */
         val goToMainActivity = findViewById<ImageView>(R.id.back_button)
         goToMainActivity.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()

@@ -118,6 +118,7 @@
                     android:divider="@null"
                     android:dividerHeight="0dp"
                     android:clipToPadding="false"/>
+                /
 
 
                 <LinearLayout

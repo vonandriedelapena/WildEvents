@@ -48,4 +48,9 @@ class LoginActivity : AppCompatActivity() {
             startActivity(registerScreen)
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishAffinity() // Closes all activities and exits the app
+    }
 }
