@@ -8,7 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.csit284.myapplication.utils.isValidEntry
+import com.csit284.myapplication.utils.isInvalidEntry
 import com.csit284.myapplication.utils.txt
 
 
@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
 
         val buttonLogin = findViewById<Button>(R.id.button_login)
         buttonLogin.setOnClickListener {
-            if(thisEmail.isValidEntry()|| thisPassword.isValidEntry()) {
+            if(thisEmail.isInvalidEntry()|| thisPassword.isInvalidEntry()) {
                 Toast.makeText(this, "Username and Password must not be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }

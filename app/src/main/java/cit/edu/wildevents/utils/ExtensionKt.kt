@@ -8,9 +8,13 @@ fun EditText.txt(): String {
     return this.text.toString()
 }
 
-fun EditText.isValidEntry(): Boolean {
-    return this.text.toString().isNullOrEmpty()
+fun EditText.isInvalidEntry(): Boolean {
+    val username = this.text.toString()
+    val usernameRegex = "^[a-zA-Z0-9_]{4,20}$".toRegex()  // Only letters, numbers, and underscores, 4-20 chars
+
+    return username.isEmpty() || !username.matches(usernameRegex)
 }
+
 
 fun Activity.toast(msg:String) {
     Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
