@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1057162862606",
+    "project_id": "wildevents-f1d3d",
+    "storage_bucket": "wildevents-f1d3d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1057162862606:android:f00b7a07c59555d322dc5f",
+        "android_client_info": {
+          "package_name": "cit.edu.wildevents"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBl4Z6LCQ-XdGvsYIVYFWZSqZ2Loo7gUQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
