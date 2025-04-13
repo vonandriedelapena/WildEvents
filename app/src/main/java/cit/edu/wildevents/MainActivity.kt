@@ -38,4 +38,9 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null) // Add this line to retain fragment state
             .commit()
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finishAffinity() // Closes all activities and exits the app
+    }
 }

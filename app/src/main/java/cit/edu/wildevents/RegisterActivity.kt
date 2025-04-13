@@ -116,11 +116,12 @@ class RegisterActivity : AppCompatActivity() {
         goToLogin.setOnClickListener {
             val loginScreen = Intent(this, LoginActivity::class.java)
             startActivity(loginScreen)
+            finish()
         }
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAffinity() // Closes all activities and exits the app
+        finish() // Closes all activities and exits the app
     }
 
     private fun selectRole(selectedButton: Button, unselectedButton: Button) {

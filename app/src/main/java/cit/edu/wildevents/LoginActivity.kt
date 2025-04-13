@@ -3,6 +3,7 @@ package cit.edu.wildevents
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -36,9 +37,10 @@ class LoginActivity : AppCompatActivity() {
         val buttonLogin = findViewById<Button>(R.id.button_login)
         buttonLogin.setOnClickListener {
             if(thisEmail.isValidEntry()|| thisPassword.isValidEntry()) {
-                Toast.makeText(this, "Username and Password must not be empty", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Email and Password must not be empty", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
+
 
             startActivity(mainScreen)
         }
@@ -46,11 +48,12 @@ class LoginActivity : AppCompatActivity() {
         val goToSignup = findViewById<TextView>(R.id.goToSignup)
         goToSignup.setOnClickListener {
             startActivity(registerScreen)
+            finish()
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAffinity() // Closes all activities and exits the app
+        finish() // Closes all activities and exits the app
     }
 }
