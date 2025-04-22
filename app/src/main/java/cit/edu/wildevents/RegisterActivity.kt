@@ -1,21 +1,29 @@
 package cit.edu.wildevents
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Patterns
 import android.view.KeyEvent
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import android.graphics.Color
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.FirebaseFirestore
 import com.csit284.myapplication.utils.toast
 
 class RegisterActivity : AppCompatActivity() {
+
+    private lateinit var db: FirebaseFirestore
+    private var isHost: Boolean? = null
+    private var isVerified: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.screen_register)
 
-        var userType: String = ""
+        db = FirebaseFirestore.getInstance()
 
         val firstName = findViewById<EditText>(R.id.firstName)
         val lastName = findViewById<EditText>(R.id.lastName)
@@ -23,109 +31,184 @@ class RegisterActivity : AppCompatActivity() {
         val password = findViewById<EditText>(R.id.passwordRegister)
         val confirmPassword = findViewById<EditText>(R.id.confirmPassword)
 
-        val goToLogin = findViewById<TextView>(R.id.goToLogin)
         val btnSignup = findViewById<Button>(R.id.btnSignup)
         val btnHost = findViewById<Button>(R.id.btnHost)
         val btnStudent = findViewById<Button>(R.id.btnStudent)
+        val goToLogin = findViewById<TextView>(R.id.goToLogin)
 
-        val sharedPreferences: SharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-
+        // Role selection
         btnHost.setOnClickListener {
-            selectRole(btnHost, btnStudent)
-            userType = "host"
+            if (isVerified) {
+                selectRole(btnHost, btnStudent)
+                isHost = true
+                return@setOnClickListener
+            }
+
+            val input = EditText(this)
+            input.hint = "Enter Host Code"
+            input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+
+            val errorText = TextView(this).apply {
+                setTextColor(Color.parseColor("#800000"))
+                textSize = 14f
+                text = ""
+            }
+
+            val layout = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(50, 20, 50, 0)
+                addView(input)
+                addView(errorText)
+            }
+
+            val dialog = AlertDialog.Builder(this)
+                .setTitle("Host Verification")
+                .setMessage("Please enter the verification code to register as a host.")
+                .setView(layout)
+                .setPositiveButton("Verify", null) // override later
+                .setNegativeButton("Cancel") { d, _ ->
+                    isHost = null
+                    isVerified = false
+                    d.cancel()
+                }
+                .create()
+
+            dialog.setOnShowListener {
+                val verifyButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                verifyButton.setOnClickListener {
+                    val enteredCode = input.text.toString().trim()
+                    val correctCode = "WILDHOST2024"
+
+                    if (enteredCode == correctCode) {
+                        selectRole(btnHost, btnStudent)
+                        isHost = true
+                        isVerified = true
+                        toast("Host verified")
+                        dialog.dismiss()
+                    } else {
+                        errorText.text = "Incorrect verification code. Try again."
+                    }
+                }
+            }
+
+            dialog.show()
         }
+
 
         btnStudent.setOnClickListener {
             selectRole(btnStudent, btnHost)
-            userType = "student"
+            isHost = false
         }
 
-        // Function to handle "Enter" key navigation
-        fun setEnterKeyListener(editText: EditText, nextEditText: EditText?) {
-            editText.setOnEditorActionListener { _, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                    (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)) {
-                    nextEditText?.requestFocus()
-                    return@setOnEditorActionListener true
-                }
-                false
-            }
-        }
-
-        // Setup "Enter" key navigation
+        // Enter key navigation
         setEnterKeyListener(firstName, lastName)
         setEnterKeyListener(lastName, email)
         setEnterKeyListener(email, password)
         setEnterKeyListener(password, confirmPassword)
-        setEnterKeyListener(confirmPassword, null) // Last field, so no next focus
 
         btnSignup.setOnClickListener {
-            val passwordText = password.text.toString()
-            val confirmPasswordText = confirmPassword.text.toString()
+            val fName = firstName.text.toString().trim()
+            val lName = lastName.text.toString().trim()
+            val userEmail = email.text.toString().trim()
+            val pass = password.text.toString()
+            val confirmPass = confirmPassword.text.toString()
 
-            if (firstName.text.isNullOrEmpty() || lastName.text.isNullOrEmpty() ||
-                email.text.isNullOrEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty()) {
-
-                Toast.makeText(this, "Ensure all fields are filled", Toast.LENGTH_LONG).show()
+            if (fName.isEmpty() || lName.isEmpty() || userEmail.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
+                toast("Please fill in all fields")
                 return@setOnClickListener
             }
 
-            if (!Patterns.EMAIL_ADDRESS.matcher(email.text).matches()) {
-                Toast.makeText(this, "Invalid email format", Toast.LENGTH_LONG).show()
+            if (!Patterns.EMAIL_ADDRESS.matcher(userEmail).matches()) {
+                toast("Invalid email format")
                 return@setOnClickListener
             }
 
-            // Validate password complexity
-            if (!passwordText.matches(Regex(".*\\d.*")) || !passwordText.matches(Regex(".*[!@#\$%^&*()_+\\-=\\[\\]{};':\",.<>?/].*"))) {
-                Toast.makeText(this, "Password must contain at least one number and one special character", Toast.LENGTH_LONG).show()
+            if (!pass.matches(Regex(".*\\d.*")) || !pass.matches(Regex(".*[!@#\$%^&*()_+\\-=\\[\\]{};':\",.<>?/].*"))) {
+                toast("Password must contain at least one number and one special character")
                 return@setOnClickListener
             }
 
-            // Validate password match
-            if (passwordText != confirmPasswordText) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_LONG).show()
+            if (pass != confirmPass) {
+                toast("Passwords do not match")
                 return@setOnClickListener
             }
 
-            if (userType.isEmpty()) {
-                Toast.makeText(this, "Please select either Host or Student", Toast.LENGTH_LONG).show()
+            if (isHost == null) {
+                toast("Please select either Host or Student")
                 return@setOnClickListener
             }
 
-            // Save user info in SharedPreferences
-            val editor = sharedPreferences.edit()
-            editor.putString("firstName", firstName.text.toString())
-            editor.putString("lastName", lastName.text.toString())
-            editor.putString("email", email.text.toString())
-            editor.putString("phoneNumber", "Not provided")
-            editor.putString("address", "Not provided")
-            editor.putString("emergencyContact", "Not provided")
-            editor.putBoolean("isVerified", false)
-            editor.putString("userType", userType)
-            editor.apply()
+            if(isHost == false){
+                isVerified = false;
+            }
 
-            // Redirect to login
-            val loginScreen = Intent(this, LoginActivity::class.java)
-            startActivity(loginScreen.apply {
-                putExtra("email", email.text.toString())
-                putExtra("password", passwordText)
-            })
-            finish() // Close this activity
+            db.collection("users")
+                .whereEqualTo("email", userEmail)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (!result.isEmpty) {
+                        toast("Email already exists")
+                        return@addOnSuccessListener
+                    }
+
+                    val userData = hashMapOf(
+                        "firstName" to fName,
+                        "lastName" to lName,
+                        "email" to userEmail,
+                        "password" to pass,
+                        "isHost" to isHost!!,
+                        "address" to "Not provided",
+                        "phoneNumber" to "Not provided",
+                        "emergencyContact" to "Not provided",
+                        "isVerified" to isVerified,
+                        "profilePic" to "default.png",
+                        "isFirstTime" to true,
+                    )
+
+
+                    db.collection("users").add(userData)
+                        .addOnSuccessListener {
+                            toast("Registered successfully!")
+                            val loginIntent = Intent(this, LoginActivity::class.java)
+                            loginIntent.putExtra("email", userEmail)
+                            loginIntent.putExtra("password", pass)
+                            startActivity(loginIntent)
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            toast("Registration failed: ${e.message}")
+                        }
+                }
+                .addOnFailureListener { e ->
+                    toast("Error checking existing email: ${e.message}")
+                }
         }
 
         goToLogin.setOnClickListener {
-            val loginScreen = Intent(this, LoginActivity::class.java)
-            startActivity(loginScreen)
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
     }
+
     override fun onBackPressed() {
         super.onBackPressed()
-        finish() // Closes all activities and exits the app
+        finish()
     }
 
     private fun selectRole(selectedButton: Button, unselectedButton: Button) {
         selectedButton.isSelected = true
         unselectedButton.isSelected = false
+    }
+
+    private fun setEnterKeyListener(current: EditText, next: EditText?) {
+        current.setOnEditorActionListener { _, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)
+            ) {
+                next?.requestFocus()
+                return@setOnEditorActionListener true
+            }
+            false
+        }
     }
 }

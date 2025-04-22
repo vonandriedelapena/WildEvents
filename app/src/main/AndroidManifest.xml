@@ -2,7 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
+        android:requestLegacyExternalStorage="true"
+        android:name=".app.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -31,6 +40,15 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
+            android:name=".CreateEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EventDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LandingPageActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
@@ -40,5 +58,9 @@
             </intent-filter>
         </activity>
     </application>
+
+    <meta-data
+        android:name="CLOUDINARY_URL"
+        android:value="cloudinary://664212468912773:J-eXM5x5YLXcHk7LBQk0DYuXaiM@dms4vmxqk"/>
 
 </manifest>

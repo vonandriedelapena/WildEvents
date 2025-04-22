@@ -26,7 +26,7 @@
             <EditText
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:hint="Search"
                 android:paddingStart="15dp"
                 android:textSize="16sp"
@@ -36,6 +36,7 @@
                 android:drawableTint="@color/black"
                 android:elevation="6dp"/>
 
+            <!-- Categories -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,75 +54,98 @@
                     android:padding="5dp">
 
                     <Button
+                        android:id="@+id/button_general"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="General"
+                        android:tag="General"
                         android:background="@drawable/category_background"
                         android:backgroundTint="#FFFFFF"
                         android:textColor="@color/white"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp"
+                        android:height="5dp" />
 
                     <Button
+                        android:id="@+id/button_engr"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ENGR"
+                        android:tag="ENGR"
                         android:background="@drawable/category_background"
                         android:textColor="@color/white"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
                     <Button
+                        android:id="@+id/button_arch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ARCH"
+                        android:tag="ARCH"
                         android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
                     <Button
+                        android:id="@+id/button_cnahs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CNAHS"
+                        android:tag="CNAHS"
                         android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
                     <Button
+                        android:id="@+id/button_ccs"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CCS"
+                        android:tag="CCS"
                         android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
                     <Button
+                        android:id="@+id/button_crim"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CRIM"
+                        android:tag="CRIM"
                         android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
                     <Button
+                        android:id="@+id/button_cmba"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="CMBA"
+                        android:tag="CMBA"
                         android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
+                        android:layout_marginEnd="10dp" />
 
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="OTHERS"
-                        android:background="@drawable/category_background"
-                        android:layout_marginEnd="10dp"/>
                 </LinearLayout>
             </HorizontalScrollView>
 
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/events_list_view"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/events_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/top_section"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="10dp"/>
+            android:padding="10dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
 
     </RelativeLayout>
+
+    <!-- Floating Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Add Event"
+        android:visibility="visible"
+        android:src="@drawable/ic_add"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/white"/>
 </FrameLayout>

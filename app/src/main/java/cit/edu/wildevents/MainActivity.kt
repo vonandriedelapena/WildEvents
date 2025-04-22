@@ -1,6 +1,5 @@
 package cit.edu.wildevents
 
-import DiscoverFragment
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +24,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<ImageView>(R.id.nav_discover).setOnClickListener {
             switchFragment(DiscoverFragment())
+        }
+
+        findViewById<ImageView>(R.id.wishlist_button).setOnClickListener {
+            switchFragment(YourEventsFragment())
         }
 
 //        findViewById<ImageView>(R.id.nav_settings).setOnClickListener {
