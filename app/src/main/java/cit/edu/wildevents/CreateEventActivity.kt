@@ -1,8 +1,11 @@
 package cit.edu.wildevents
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -247,39 +250,47 @@ class CreateEventActivity : AppCompatActivity() {
         if (imageUri == null) {
             Log.d("CreateEventActivity", "No image selected. Saving event without image.")
             saveEventToFirestore(db, eventId, eventMap)
-            return
+        } else {
+            MediaManager.get().upload(imageUri)
+                .option("folder", "event_covers/")
+                .option("resource_type", "image")
+                .callback(object : com.cloudinary.android.callback.UploadCallback {
+                    override fun onStart(requestId: String?) {
+                        Log.d("CreateEventActivity", "Cloudinary upload started: $requestId")
+                    }
+
+                    override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
+                        Log.d("CreateEventActivity", "Upload progress: $bytes / $totalBytes")
+                    }
+
+                    override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
+                        val imageUrl = resultData?.get("secure_url") as? String
+                        Log.d("CreateEventActivity", "Cloudinary upload successful: $imageUrl")
+                        eventMap["coverImageUrl"] = imageUrl
+                        saveEventToFirestore(db, eventId, eventMap)
+                    }
+
+                    override fun onError(requestId: String?, error: ErrorInfo?) {
+                        Log.e("CreateEventActivity", "Cloudinary upload failed: ${error?.description}")
+                        Toast.makeText(this@CreateEventActivity, "Upload failed: ${error?.description}", Toast.LENGTH_LONG).show()
+                    }
+
+                    override fun onReschedule(requestId: String?, error: ErrorInfo?) {
+                        Log.w("CreateEventActivity", "Cloudinary upload rescheduled: ${error?.description}")
+                    }
+                })
+                .dispatch()
         }
 
-        MediaManager.get().upload(imageUri)
-            .option("folder", "event_covers/")
-            .option("resource_type", "image")
-            .callback(object : com.cloudinary.android.callback.UploadCallback {
-                override fun onStart(requestId: String?) {
-                    Log.d("CreateEventActivity", "Cloudinary upload started: $requestId")
-                }
+        // Check and request exact alarm permission
+        checkAndRequestExactAlarmPermission()
 
-                override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
-                    Log.d("CreateEventActivity", "Upload progress: $bytes / $totalBytes")
-                }
-
-                override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
-                    val imageUrl = resultData?.get("secure_url") as? String
-                    Log.d("CreateEventActivity", "Cloudinary upload successful: $imageUrl")
-                    eventMap["coverImageUrl"] = imageUrl
-                    saveEventToFirestore(db, eventId, eventMap)
-                }
-
-                override fun onError(requestId: String?, error: ErrorInfo?) {
-                    Log.e("CreateEventActivity", "Cloudinary upload failed: ${error?.description}")
-                    Toast.makeText(this@CreateEventActivity, "Upload failed: ${error?.description}", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onReschedule(requestId: String?, error: ErrorInfo?) {
-                    Log.w("CreateEventActivity", "Cloudinary upload rescheduled: ${error?.description}")
-                }
-            })
-            .dispatch()
-
+        // Schedule a reminder 1 hour before the event
+        scheduleReminder(
+            eventTime = startTime!!.timeInMillis - 3600000, // 1 hour before the event
+            title = eventName,
+            message = "Your event '$eventName' is starting soon!"
+        )
     }
 
 
@@ -332,5 +343,34 @@ class CreateEventActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun scheduleReminder(eventTime: Long, title: String, message: String) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, ReminderReceiver::class.java).apply {
+            putExtra("title", title)
+            putExtra("message", message)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Schedule the alarm
+        alarmManager.setExact(
+            AlarmManager.RTC_WAKEUP,
+            eventTime,
+            pendingIntent
+        )
+    }
+
+    private fun checkAndRequestExactAlarmPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Guide the user to the app settings to enable the permission
+                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                startActivity(intent)
+            }
+        }
     }
 }

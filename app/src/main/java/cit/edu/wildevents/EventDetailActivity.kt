@@ -1,5 +1,6 @@
 package cit.edu.wildevents
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.*
@@ -10,7 +11,10 @@ import java.util.*
 import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cit.edu.wildevents.app.MyApplication
+import cit.edu.wildevents.data.Comment
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -57,6 +61,14 @@ class EventDetailActivity : AppCompatActivity() {
         val imageUrl = intent.getStringExtra("imageUrl")
         val eventId = intent.getStringExtra("eventId")
         val currentUser = (application as MyApplication).currentUser
+        val comments = listOf(
+            Comment("1", "John Doe", null, "This is a great event!", System.currentTimeMillis()),
+            Comment("2", "Jane Smith", "https://example.com/avatar.jpg", "Looking forward to it!", System.currentTimeMillis())
+        )
+
+        val recyclerView = findViewById<RecyclerView>(R.id.comments_recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = CommentAdapter(comments)
 
         // Bind data
         titleTextView.text = eventName
@@ -135,6 +147,20 @@ class EventDetailActivity : AppCompatActivity() {
                 .into(imageView)
         } else {
             imageView.setImageResource(R.drawable.placeholder_image)
+        }
+
+        val isHost = intent.getBooleanExtra("isHost", false) // Get isHost from Intent
+
+        if (isHost) {
+            // If the user is the host, set the button to "Edit Event"
+            joinButton.text = "Edit Event"
+            joinButton.setBackgroundColor(Color.parseColor("#FFA500")) // Orange color for edit
+            joinButton.setOnClickListener {
+                // Navigate to the Edit Event screen
+                val intent = Intent(this, EditEventActivity::class.java)
+                intent.putExtra("eventId", eventId) // Pass the event ID to the edit screen
+                startActivity(intent)
+            }
         }
 
         // Button action

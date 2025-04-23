@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 
 class MainActivity : AppCompatActivity() {
+    private var previouslySelectedButton: ImageView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -17,22 +19,46 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
+        val discoverButton = findViewById<ImageView>(R.id.nav_discover)
+        val profileButton = findViewById<ImageView>(R.id.nav_profile)
+        val wishlistButton = findViewById<ImageView>(R.id.nav_wishlist)
+        val messagesButton = findViewById<ImageView>(R.id.nav_messages)
+
+        // Set default selected button
+        previouslySelectedButton = discoverButton
+        discoverButton.setImageResource(R.drawable.icon_selector)
+
         // Handle Bottom Navigation Clicks
-        findViewById<ImageView>(R.id.nav_profile).setOnClickListener {
-            switchFragment(ProfileFragment())
-        }
-
-        findViewById<ImageView>(R.id.nav_discover).setOnClickListener {
+        discoverButton.setOnClickListener {
             switchFragment(DiscoverFragment())
+            updateSelectedButton(discoverButton, R.drawable.ic_magnifying_glass)
         }
 
-        findViewById<ImageView>(R.id.wishlist_button).setOnClickListener {
-            switchFragment(YourEventsFragment())
+        profileButton.setOnClickListener {
+            switchFragment(ProfileFragment())
+            updateSelectedButton(profileButton, R.drawable.ic_user)
         }
 
-//        findViewById<ImageView>(R.id.nav_settings).setOnClickListener {
-//            switchFragment(SettingsFragment())
-//        }
+        wishlistButton.setOnClickListener {
+            switchFragment(WishlistFragment())
+            updateSelectedButton(wishlistButton, R.drawable.ic_heart)
+        }
+
+        messagesButton.setOnClickListener {
+            switchFragment(MessagesFragment())
+            updateSelectedButton(messagesButton, R.drawable.ic_message)
+        }
+    }
+
+    private fun updateSelectedButton(newSelectedButton: ImageView, defaultDrawable: Int) {
+        // Reset the previously selected button to its default drawable
+        previouslySelectedButton?.setImageResource(defaultDrawable)
+
+        // Apply the icon_selector to the new selected button
+        newSelectedButton.setImageResource(R.drawable.icon_selector)
+
+        // Update the reference to the currently selected button
+        previouslySelectedButton = newSelectedButton
     }
 
     private fun switchFragment(fragment: Fragment) {
@@ -44,6 +70,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        finishAffinity() // Closes all activities and exits the app
+        finish() // Closes all activities and exits the app
     }
 }

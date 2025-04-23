@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- This is the layout for the Discover Fragment. It contains a search bar,
+category buttons, and a list of events -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,7 +8,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".DiscoverFragment">
-
     <!-- Main Container -->
     <RelativeLayout
         android:layout_width="match_parent"
@@ -40,9 +41,8 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
                 android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="5dp"
                 android:scrollbars="none">
 
