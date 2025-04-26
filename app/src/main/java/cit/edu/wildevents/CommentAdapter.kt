@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cit.edu.wildevents.data.Comment
 import com.bumptech.glide.Glide
 
-class CommentAdapter(private val comments: List<Comment>) :
+class CommentAdapter(private var comments: MutableList<Comment>) :
     RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
 
     class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,18 +29,25 @@ class CommentAdapter(private val comments: List<Comment>) :
         val comment = comments[position]
         holder.userName.text = comment.userName
         holder.commentContent.text = comment.content
-        holder.commentTimestamp.text = android.text.format.DateFormat.format(
-            "dd MMM yyyy, hh:mm a", comment.timestamp
-        )
-        if (comment.userAvatarUrl != null) {
+        holder.commentTimestamp.text = comment.timestamp?.let {
+            android.text.format.DateFormat.format("dd MMM yyyy, hh:mm a", it).toString()
+        } ?: "Just now"
+
+        if (!comment.userAvatarUrl.isNullOrEmpty()) {
             Glide.with(holder.userAvatar.context)
                 .load(comment.userAvatarUrl)
                 .circleCrop()
                 .into(holder.userAvatar)
         } else {
-            holder.userAvatar.setImageResource(R.drawable.ic_user)
+            holder.userAvatar.setImageResource(R.drawable.ic_user) // fallback avatar
         }
     }
 
     override fun getItemCount(): Int = comments.size
+
+    fun updateComments(newComments: List<Comment>) {
+        comments.clear()
+        comments.addAll(newComments)
+        notifyDataSetChanged()
+    }
 }

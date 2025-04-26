@@ -30,24 +30,34 @@ class EventsViewModel : ViewModel() {
         filterEvents(currentQuery, currentCategory)
     }
 
-    fun startListeningToEvents() {
+    private fun startListeningToEvents() {
         listenerRegistration = FirebaseFirestore.getInstance()
             .collection("events")
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
                     val loadedEvents = snapshot.mapNotNull { doc ->
-                        Event(
-                            eventId = doc.getString("id") ?: "",
-                            eventName = doc.getString("name") ?: "",
-                            startTime = doc.getTimestamp("startTime")?.toDate()?.time ?: 0L,
-                            endTime = doc.getTimestamp("endTime")?.toDate()?.time ?: 0L,
-                            location = doc.getString("location") ?: "",
-                            description = doc.getString("description") ?: "",
-                            imageUrl = doc.getString("coverImageUrl"),
-                            hostId = doc.getString("hostId") ?: "",
-                            tags = doc.get("tags") as? List<String> ?: emptyList(),
-                            capacity = doc.getLong("capacity")?.toInt()
-                        )
+                        try {
+                            val startTime = (doc.get("startTime") as? com.google.firebase.Timestamp)
+                                ?.toDate()?.time ?: 0L
+                            val endTime = (doc.get("endTime") as? com.google.firebase.Timestamp)
+                                ?.toDate()?.time ?: 0L
+
+                            Event(
+                                eventId = doc.getString("id") ?: "",
+                                eventName = doc.getString("name") ?: "",
+                                startTime = startTime,
+                                endTime = endTime,
+                                location = doc.getString("location") ?: "",
+                                description = doc.getString("description") ?: "",
+                                imageUrl = doc.getString("coverImageUrl"),
+                                hostId = doc.getString("hostId") ?: "",
+                                tags = doc.get("tags") as? List<String> ?: emptyList(),
+                                capacity = doc.getLong("capacity")?.toInt()
+                            )
+                        } catch (e: Exception) {
+                            Log.e("EventsViewModel", "Error parsing event: ${e.localizedMessage}")
+                            null
+                        }
                     }
 
                     _allEvents.value = loadedEvents
@@ -55,6 +65,7 @@ class EventsViewModel : ViewModel() {
                 }
             }
     }
+
 
     fun filterEvents(query: String, category: String? = null) {
         val currentTime = System.currentTimeMillis()

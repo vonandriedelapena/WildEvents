@@ -36,7 +36,6 @@ class CreateEventActivity : AppCompatActivity() {
     private lateinit var pickImagesBtn: ImageButton
     private lateinit var eventNameInput: EditText
     private lateinit var eventLocationInput: EditText
-    private lateinit var eventAddress: EditText
     private lateinit var eventDateAndTimeLayout: LinearLayout
     private lateinit var eventDateText: TextView
     private lateinit var eventTimeText: TextView
@@ -221,7 +220,6 @@ class CreateEventActivity : AppCompatActivity() {
     private fun createEvent() {
         val eventName = eventNameInput.text.toString().trim()
         val location = eventLocationInput.text.toString().trim()
-        val address = eventAddress.text.toString().trim()
         val description = eventDescriptionInput.text.toString().trim()
 
         if (eventName.isEmpty() || location.isEmpty() || eventDateTime == null || startTime == null || endTime == null) {
@@ -277,7 +275,9 @@ class CreateEventActivity : AppCompatActivity() {
 
                     override fun onReschedule(requestId: String?, error: ErrorInfo?) {
                         Log.w("CreateEventActivity", "Cloudinary upload rescheduled: ${error?.description}")
+                        Toast.makeText(this@CreateEventActivity, "Upload rescheduled: ${error?.description}", Toast.LENGTH_SHORT).show()
                     }
+
                 })
                 .dispatch()
         }
@@ -286,11 +286,7 @@ class CreateEventActivity : AppCompatActivity() {
         checkAndRequestExactAlarmPermission()
 
         // Schedule a reminder 1 hour before the event
-        scheduleReminder(
-            eventTime = startTime!!.timeInMillis - 3600000, // 1 hour before the event
-            title = eventName,
-            message = "Your event '$eventName' is starting soon!"
-        )
+        scheduleNotification(startTime!!, eventName)
     }
 
 
@@ -345,23 +341,27 @@ class CreateEventActivity : AppCompatActivity() {
         return true
     }
 
-    private fun scheduleReminder(eventTime: Long, title: String, message: String) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private fun scheduleNotification(startTime: Calendar, eventName: String) {
         val intent = Intent(this, ReminderReceiver::class.java).apply {
-            putExtra("title", title)
-            putExtra("message", message)
+            putExtra("title", "Upcoming Event")
+            putExtra("message", "$eventName is starting soon!")
         }
+
         val pendingIntent = PendingIntent.getBroadcast(
-            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            this,
+            startTime.timeInMillis.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Schedule the alarm
-        alarmManager.setExact(
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            eventTime,
+            startTime.timeInMillis - 60 * 60 * 1000, // 10 minutes before event
             pendingIntent
         )
     }
+
 
     private fun checkAndRequestExactAlarmPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {

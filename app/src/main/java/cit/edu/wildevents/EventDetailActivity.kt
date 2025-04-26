@@ -3,6 +3,7 @@ package cit.edu.wildevents
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import cit.edu.wildevents.app.MyApplication
 import cit.edu.wildevents.data.Comment
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Query
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -29,7 +32,8 @@ class EventDetailActivity : AppCompatActivity() {
     private lateinit var joinButton: Button
     private lateinit var participantsContainer: LinearLayout // You already have this
     private var attendeeDocId: String? = null
-
+    private lateinit var commentAdapter: CommentAdapter
+    private lateinit var commentsRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,14 +65,8 @@ class EventDetailActivity : AppCompatActivity() {
         val imageUrl = intent.getStringExtra("imageUrl")
         val eventId = intent.getStringExtra("eventId")
         val currentUser = (application as MyApplication).currentUser
-        val comments = listOf(
-            Comment("1", "John Doe", null, "This is a great event!", System.currentTimeMillis()),
-            Comment("2", "Jane Smith", "https://example.com/avatar.jpg", "Looking forward to it!", System.currentTimeMillis())
-        )
 
-        val recyclerView = findViewById<RecyclerView>(R.id.comments_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = CommentAdapter(comments)
+
 
         // Bind data
         titleTextView.text = eventName
@@ -149,23 +147,18 @@ class EventDetailActivity : AppCompatActivity() {
             imageView.setImageResource(R.drawable.placeholder_image)
         }
 
-        val isHost = intent.getBooleanExtra("isHost", false) // Get isHost from Intent
-
-        if (isHost) {
-            // If the user is the host, set the button to "Edit Event"
-            joinButton.text = "Edit Event"
-            joinButton.setBackgroundColor(Color.parseColor("#FFA500")) // Orange color for edit
-            joinButton.setOnClickListener {
-                // Navigate to the Edit Event screen
-                val intent = Intent(this, EditEventActivity::class.java)
-                intent.putExtra("eventId", eventId) // Pass the event ID to the edit screen
-                startActivity(intent)
-            }
-        }
-
         // Button action
         joinButton.setOnClickListener {
-            if (eventId != null && currentUser != null) {
+            val isHost = currentUser?.isHost == true  && currentUser.id == hostId
+            Log.d("EventDetailActivity", "isHost: $isHost")
+            if (isHost) {
+                setButtonToEdit()
+                joinButton.setOnClickListener {
+                    val intent = Intent(this, EditEventActivity::class.java)
+                    intent.putExtra("eventId", eventId)
+                    startActivity(intent)
+                }
+            } else if (eventId != null && currentUser != null) {
                 val db = FirebaseFirestore.getInstance()
 
                 if (attendeeDocId == null) {
@@ -211,7 +204,76 @@ class EventDetailActivity : AppCompatActivity() {
             }
         }
 
+        commentsRecyclerView = findViewById(R.id.comments_recycler_view)
+        val commentInput = findViewById<EditText>(R.id.comment_input)
+        val postCommentButton = findViewById<Button>(R.id.post_comment_button)
 
+        commentAdapter = CommentAdapter(mutableListOf())
+        commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        loadCommentsForEvent(eventId)
+
+        postCommentButton.setOnClickListener {
+            val content = commentInput.text.toString().trim()
+            if (content.isNotEmpty()) {
+                postComment(content)
+            }
+        }
+    }
+    private fun postComment(content: String) {
+        val currentUser = (application as MyApplication).currentUser
+        val eventId = intent.getStringExtra("eventId")
+
+        if (currentUser != null && eventId != null) {
+            val commentData = mapOf(
+                "eventId" to eventId,
+                "userId" to currentUser.id,
+                "userName" to currentUser.firstName,
+                "userAvatarUrl" to currentUser.profilePic,
+                "content" to content,
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+
+            FirebaseFirestore.getInstance()
+                .collection("comments")
+                .add(commentData)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Comment posted successfully!", Toast.LENGTH_SHORT).show()
+                    loadCommentsForEvent(eventId) // Refresh comments
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to post comment: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(this, "Unable to post comment. Missing user or event information.", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun loadCommentsForEvent(eventId: String?) {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("comments")
+            .whereEqualTo("eventId", eventId)
+            .get()
+            .addOnSuccessListener { result ->
+                val comments = result.mapNotNull { doc ->
+                    val timestamp = doc.getTimestamp("timestamp")?.toDate()?.time
+                    if (timestamp != null) {
+                        Comment(
+                            id = doc.id,
+                            userName = doc.getString("userName") ?: "Unknown",
+                            userAvatarUrl = doc.getString("userAvatarUrl"),
+                            content = doc.getString("content") ?: "",
+                            timestamp = timestamp
+                        )
+                    } else null // exclude comments without valid timestamps
+                }.sortedBy { it.timestamp }
+
+                commentAdapter.updateComments(comments)
+                commentsRecyclerView.scrollToPosition(comments.size - 1)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error loading comments: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     fun setButtonToGoing() {
@@ -224,8 +286,14 @@ class EventDetailActivity : AppCompatActivity() {
         joinButton.setBackgroundColor(Color.parseColor("#333333")) // properly parsed hex color
     }
 
+    fun setButtonToEdit() {
+        joinButton.text = "Edit Event"
+        joinButton.setBackgroundColor(Color.parseColor("#FFA500")) // Orange color for edit
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
     }
+
 }

@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
-
+import com.google.firebase.Timestamp
 class EditEventActivity : AppCompatActivity() {
 
     private lateinit var eventNameInput: EditText
@@ -27,7 +27,7 @@ class EditEventActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_eventdesign)
+        setContentView(R.layout.activity_edit_eventdesign)
 
         // Initialize UI elements
         eventNameInput = findViewById(R.id.eventNameInput)
@@ -80,7 +80,6 @@ class EditEventActivity : AppCompatActivity() {
             saveEventDetails()
         }
     }
-
     private fun loadEventDetails() {
         if (eventId != null) {
             FirebaseFirestore.getInstance()
@@ -93,8 +92,12 @@ class EditEventActivity : AppCompatActivity() {
                         eventDescriptionInput.setText(document.getString("description"))
                         eventLocationInput.setText(document.getString("location"))
 
-                        val timestamp = document.getLong("startTime") ?: 0L
-                        calendar.timeInMillis = timestamp
+                        val startTime = document.get("startTime")
+                        if (startTime is Long) {
+                            calendar.timeInMillis = startTime
+                        } else if (startTime is Timestamp) {
+                            calendar.time = startTime.toDate()
+                        }
                         updateDateText()
                         updateTimeText()
                     }
@@ -104,6 +107,7 @@ class EditEventActivity : AppCompatActivity() {
                 }
         }
     }
+
 
     private fun updateDateText() {
         val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
