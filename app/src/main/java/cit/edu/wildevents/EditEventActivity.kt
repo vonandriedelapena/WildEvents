@@ -333,7 +333,19 @@ class EditEventActivity : AppCompatActivity() {
         db.collection("events").document(eventId).update(eventMap as Map<String, Any>)
             .addOnSuccessListener {
                 Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show()
+                // After updating the event in Firestore
+                val updatedIntent = Intent()
+                updatedIntent.putExtra("eventId", eventId) // Pass the eventId
+                updatedIntent.putExtra("eventName", eventNameInput.text.toString())
+                updatedIntent.putExtra("description", eventDescriptionInput.text.toString())
+                updatedIntent.putExtra("startTime", startTime?.time)
+                updatedIntent.putExtra("endTime", endTime?.time)
+                updatedIntent.putExtra("location", eventLocationInput.text.toString())
+                updatedIntent.putExtra("imageUrl", existingCoverImageUrl.toString())
+
+                setResult(Activity.RESULT_OK, updatedIntent)
                 finish()
+
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()

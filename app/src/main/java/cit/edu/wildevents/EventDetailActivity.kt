@@ -83,11 +83,40 @@ class EventDetailActivity : AppCompatActivity() {
     private fun setupEditEventLauncher() {
         editEventLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                eventId = result.data?.getStringExtra("eventId") ?: eventId
-                loadEventDetails()
+                val updatedEventId = result.data?.getStringExtra("eventId") ?: eventId
+                val updatedEventName = result.data?.getStringExtra("eventName")
+                val updatedDescription = result.data?.getStringExtra("description")
+                val updatedStartTime = result.data?.getLongExtra("startTime", -1L) ?: -1L
+                val updatedEndTime = result.data?.getLongExtra("endTime", -1L) ?: -1L
+                val updatedLocation = result.data?.getStringExtra("location")
+                val updatedImageUrl = result.data?.getStringExtra("imageUrl")
+
+                // Now update the UI with the new details
+                if (updatedEventId != null) {
+                    eventId = updatedEventId
+                }
+                loadUpdatedEventDetails(updatedEventName, updatedDescription, updatedStartTime, updatedEndTime, updatedLocation, updatedImageUrl)
             }
         }
     }
+
+    private fun loadUpdatedEventDetails(eventName: String?, description: String?, startTime: Long, endTime: Long, location: String?, imageUrl: String?) {
+        titleTextView.text = eventName
+        descriptionTextView.text = description
+        locationTextView.text = location
+        formatDateTime(startTime, endTime)
+        loadEventImage(imageUrl)
+
+        // Optionally, you could also re-fetch the host info and participants after an event update
+        // Re-fetch and show Host Info if needed
+        if (!eventId.isNullOrEmpty()) {
+            loadHostInfo(eventId!!)
+        }
+
+        // Load Comments
+        loadCommentsForEvent(eventId)
+    }
+
 
     private fun loadEventDetails() {
         if (eventId == null || currentUser == null) {
@@ -329,5 +358,6 @@ class EventDetailActivity : AppCompatActivity() {
         finish()
         return true
     }
+
 
 }
