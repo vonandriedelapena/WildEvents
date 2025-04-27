@@ -1,7 +1,11 @@
 package cit.edu.wildevents
 
 import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.Typeface.BOLD
 import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -10,7 +14,10 @@ import java.util.*
 import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import cit.edu.wildevents.app.MyApplication
+import com.google.firebase.firestore.FieldPath
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -23,7 +30,7 @@ class EventDetailActivity : AppCompatActivity() {
     private lateinit var hostTextView: TextView
     private lateinit var hostImageView: ImageView
     private lateinit var joinButton: Button
-    private lateinit var participantsContainer: LinearLayout // You already have this
+    private lateinit var attendeesLayout: LinearLayout
     private var attendeeDocId: String? = null
 
 
@@ -45,7 +52,7 @@ class EventDetailActivity : AppCompatActivity() {
         hostTextView = findViewById(R.id.event_hostName)
         hostImageView = findViewById(R.id.event_host_pic)
         joinButton = findViewById(R.id.joinBtn)
-        participantsContainer = findViewById(R.id.participants_container)
+        attendeesLayout = findViewById(R.id.attendeesLayout)
 
         // Get data from Intent
         val eventName = intent.getStringExtra("eventName")
@@ -82,6 +89,7 @@ class EventDetailActivity : AppCompatActivity() {
                             Glide.with(this)
                                 .load(profilePic)
                                 .placeholder(R.drawable.ic_user) // your fallback
+                                .circleCrop()
                                 .into(hostImageView)
                         } else {
                             // Load local/default image
@@ -136,6 +144,27 @@ class EventDetailActivity : AppCompatActivity() {
         } else {
             imageView.setImageResource(R.drawable.placeholder_image)
         }
+
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("attendee")
+            .whereEqualTo("eventId", eventId)
+            .get()
+            .addOnSuccessListener { attendeeDocuments ->
+                val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
+
+                if (userIds.isEmpty()) return@addOnSuccessListener
+
+                // Now fetch users' profile pics
+                db.collection("users")
+                    .whereIn(FieldPath.documentId(), userIds.take(10)) // Firestore 'whereIn' limit is 10
+                    .get()
+                    .addOnSuccessListener { userDocuments ->
+                        val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
+                        displayAttendees(profilePics, totalCount = userIds.size)
+                    }
+            }
+
 
         // Button action
         joinButton.setOnClickListener {
@@ -194,7 +223,7 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     fun setButtonToJoin() {
-        joinButton.text = "Join Event"
+        joinButton.text = "Join Now"
         joinButton.setBackgroundColor(Color.parseColor("#333333")) // properly parsed hex color
     }
 
@@ -202,4 +231,59 @@ class EventDetailActivity : AppCompatActivity() {
         finish()
         return true
     }
+
+    private fun displayAttendees(profilePics: List<String>, totalCount: Int) {
+        attendeesLayout.removeAllViews()
+
+        val maxVisiblePfps = 3
+        val imageSize = 80
+        val overlapMargin = -30 // adjust this for more or less overlap
+
+        val actualCount = profilePics.size
+
+        for ((index, picUrl) in profilePics.withIndex()) {
+            if (index < maxVisiblePfps) {
+                val imageView = ImageView(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
+                        if (index != 0) {
+                            marginStart = overlapMargin
+                        }
+                        setPadding(4)
+                    }
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    background = ContextCompat.getDrawable(this@EventDetailActivity, R.drawable.background_circle)
+                    clipToOutline = true
+                }
+
+                Glide.with(this)
+                    .load(picUrl)
+                    .placeholder(R.drawable.ic_user)
+                    .circleCrop()
+                    .into(imageView)
+
+                attendeesLayout.addView(imageView)
+            }
+        }
+
+        // 👉 Only show the "+N" if there are more attendees than max visible
+        if (totalCount > maxVisiblePfps && actualCount > maxVisiblePfps) {
+            val extraCount = totalCount - maxVisiblePfps
+            if (extraCount > 0) {
+                val textView = TextView(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
+                        marginStart = overlapMargin
+                    }
+                    text = "+$extraCount"
+                    textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                    gravity = Gravity.CENTER
+                    background = ContextCompat.getDrawable(this@EventDetailActivity, R.drawable.circle_black_with_white_border)
+                    setTextColor(Color.WHITE)
+                    setTypeface(null, Typeface.BOLD)
+                }
+                attendeesLayout.addView(textView)
+            }
+        }
+    }
+
+
 }

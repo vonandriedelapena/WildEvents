@@ -1,58 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
-
-    <TextView
-        android:text="Select Date and Time"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/btnPickDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Date" />
-
-    <Button
-        android:id="@+id/btnPickStartTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Start Time"
-        android:layout_marginTop="8dp" />
-
-    <Button
-        android:id="@+id/btnPickEndTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select End Time"
-        android:layout_marginTop="8dp" />
+    android:background="@android:color/transparent">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="end">
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/card_rounded"
+        android:backgroundTint="#ECECEC">
 
-        <Button
-            android:id="@+id/btnCancel"
+        <TextView
+            android:text="Event Time"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="14dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel" />
+            android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/btnConfirm"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:id="@+id/btnPickDate"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="OK"
-            android:layout_marginStart="16dp" />
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_image"
+            android:backgroundTint="@color/white"
+            android:backgroundTintMode="multiply"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginEnd="5dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_event"
+                android:layout_marginEnd="10dp"/>
+
+            <TextView
+                android:id="@+id/event_date"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Start"
+                android:background="@android:color/transparent"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:gravity="center">
+
+            <!-- First input field -->
+            <LinearLayout
+                android:id="@+id/btnPickStartTime"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_image"
+                android:backgroundTint="@color/white"
+                android:backgroundTintMode="multiply"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginEnd="5dp"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_clock"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:id="@+id/event_startTime"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="Start"
+                    android:background="@android:color/transparent"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Second input field -->
+            <LinearLayout
+                android:id="@+id/btnPickEndTime"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_image"
+                android:backgroundTint="@color/white"
+                android:backgroundTintMode="multiply"
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_marginStart="5dp"
+                android:clickable="true">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_clock"
+                    android:layout_marginEnd="10dp"/>
+
+                <TextView
+                    android:id="@+id/event_endTime"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:hint="End"
+                    android:background="@android:color/transparent"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:text="Cancel" />
+
+            <Button
+                android:id="@+id/btnConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/black"
+                android:text="OK"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
     </LinearLayout>
+
 </LinearLayout>

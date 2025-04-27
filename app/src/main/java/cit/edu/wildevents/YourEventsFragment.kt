@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cit.edu.wildevents.adapter.YourEventAdapter // ✅ updated import
+import cit.edu.wildevents.helper.YourEventAdapter // ✅ updated import
 import cit.edu.wildevents.data.TimeFilterMode
 import cit.edu.wildevents.helper.EventsViewModel
 import com.google.android.material.button.MaterialButtonToggleGroup

@@ -58,177 +58,33 @@
                     app:backgroundTint="@color/white" />
             </FrameLayout>
 
-
-            <LinearLayout
-                android:id="@+id/imagePreviewLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="16dp" />
-
-            <EditText
-                android:id="@+id/eventNameInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="34sp"
-                android:fontFamily="serif"
-                android:background="@android:color/transparent"
-                android:hint="Event Name" />
-
-
-
-            <LinearLayout
-                android:id="@+id/eventTimeAndDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_image"
-                android:backgroundTint="@color/white"
-                android:backgroundTintMode="multiply"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:padding="10dp"
-                android:layout_marginTop="10dp"
-                android:clickable="true">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_clock"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/event_date"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Add Event Date"
-                        android:background="@android:color/transparent"
-                        android:textSize="16sp"
-                        android:layout_marginRight="5dp"/>
-
-                    <TextView
-                        android:id="@+id/event_startendtime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Starting time - Ending time"
-                        android:background="@android:color/transparent"
-                        android:textSize="12sp"
-                        android:layout_marginRight="5dp"/>
-
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_image"
-                android:backgroundTint="@color/white"
-                android:backgroundTintMode="multiply"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:padding="10dp"
-                android:layout_marginTop="10dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_location"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginRight="5dp">
-
-                    <EditText
-                        android:id="@+id/eventLocationInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Add Event Location"
-                        android:background="@android:color/transparent"
-                        android:textSize="16sp"
-                        />
-
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Description/Instruction"
-                android:textSize="16dp"
-                android:layout_marginTop="16dp"
-                android:textStyle="bold"/>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:orientation="horizontal"
-                android:background="@drawable/rounded_image"
-                android:layout_marginTop="10dp">
-
-                <EditText
-                    android:id="@+id/eventDescriptionInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Description.."
-                    android:minLines="3"
-                    android:gravity="top"
-                    android:background="@android:color/transparent"
-                    android:padding="16dp"/>
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Select Tags"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:textSize="16sp" />
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:id="@+id/tagFlexbox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:flexWrap="wrap"
-                app:justifyContent="flex_start"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/rounded_image">
-
-            </com.google.android.flexbox.FlexboxLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Event Options"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:textSize="16sp" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/rounded_image"
-                android:layout_marginTop="10dp">
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp">
 
                 <LinearLayout
-                    android:id="@+id/layoutCapacity"
+                    android:id="@+id/imagePreviewLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="16dp" />
+
+                <EditText
+                    android:id="@+id/eventNameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="34sp"
+                    android:fontFamily="serif"
+                    android:background="@android:color/transparent"
+                    android:hint="Event Name" />
+
+
+
+                <LinearLayout
+                    android:id="@+id/eventTimeAndDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -238,50 +94,40 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="10dp"
+                    android:layout_marginTop="10dp"
                     android:clickable="true">
 
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_clock"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="10dp"/>
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="center">
+                        android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_hashtag"
-                            android:layout_marginLeft="10dp"
+                        <TextView
+                            android:id="@+id/event_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Add Event Date"
+                            android:background="@android:color/transparent"
+                            android:textSize="16sp"
                             android:layout_marginRight="5dp"/>
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:id="@+id/event_startendtime"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:text="Capacity"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:id="@+id/eventCapacity"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:text="Unlimited"/>
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_write"
-                            android:layout_marginLeft="10dp"
+                            android:hint="Starting time - Ending time"
+                            android:background="@android:color/transparent"
+                            android:textSize="12sp"
                             android:layout_marginRight="5dp"/>
+
                     </LinearLayout>
+
 
                 </LinearLayout>
 
@@ -294,52 +140,218 @@
                     android:backgroundTintMode="multiply"
                     android:layout_gravity="center"
                     android:gravity="center"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:clickable="true">
+                    android:padding="10dp"
+                    android:layout_marginTop="10dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_location"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="10dp"/>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="center">
+                        android:orientation="vertical"
+                        android:layout_marginRight="5dp">
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_verified_user"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="5dp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <EditText
+                            android:id="@+id/eventLocationInput"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:hint="Add Event Location"
+                            android:background="@android:color/transparent"
                             android:textSize="16sp"
-                            android:text="Require Approval"/>
+                            />
 
                     </LinearLayout>
 
-                    <Switch
-                        android:id="@+id/requireApprovalSwitch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Description/Instruction"
+                    android:textSize="16dp"
+                    android:layout_marginTop="16dp"
+                    android:textStyle="bold"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="horizontal"
+                    android:background="@drawable/rounded_image"
+                    android:layout_marginTop="10dp">
+
+                    <EditText
+                        android:id="@+id/eventDescriptionInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:hint="Description.."
+                        android:minLines="3"
+                        android:maxLines="5"
+                        android:gravity="top"
+                        android:background="@android:color/transparent"
+                        android:padding="16dp"
+                        android:scrollbars="vertical"
+                        android:inputType="textMultiLine" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Tags"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:textSize="16sp" />
+
+                <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/tagFlexbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:flexWrap="wrap"
+                    app:justifyContent="flex_start"
+                    android:layout_marginBottom="16dp"
+                    android:padding="10dp"
+                    android:background="@drawable/rounded_image">
+
+                </com.google.android.flexbox.FlexboxLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Event Options"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/rounded_image"
+                    android:layout_marginTop="10dp">
+
+                    <LinearLayout
+                        android:id="@+id/layoutCapacity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@drawable/rounded_image"
+                        android:backgroundTint="@color/white"
+                        android:backgroundTintMode="multiply"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:clickable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_hashtag"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="5dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:text="Capacity"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/eventCapacity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:text="Unlimited"/>
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_write"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="5dp"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@drawable/rounded_image"
+                        android:backgroundTint="@color/white"
+                        android:backgroundTintMode="multiply"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
+                        android:clickable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_gravity="center">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_verified_user"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginRight="5dp"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:text="Require Approval"/>
+
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/requireApprovalSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+                <Button
+                    android:id="@+id/createEventBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Event"
+                    android:layout_marginTop="16dp"/>
             </LinearLayout>
 
-
-
-            <Button
-                android:id="@+id/createEventBtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Create Event"
-                android:layout_marginTop="16dp"/>
-        </LinearLayout>
+            </LinearLayout>
     </ScrollView>
 
 </LinearLayout>

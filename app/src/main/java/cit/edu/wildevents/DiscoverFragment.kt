@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import cit.edu.wildevents.adapter.EventAdapter
+import cit.edu.wildevents.helper.EventAdapter
 import cit.edu.wildevents.app.MyApplication
 import cit.edu.wildevents.data.TimeFilterMode
 import cit.edu.wildevents.helper.EventsViewModel
@@ -60,7 +60,6 @@ class DiscoverFragment : Fragment() {
                 viewModel.filterEvents(searchBar.text.toString(), selectedCategory)
             }
         }
-
 
         // Search bar listener
         searchBar.addTextChangedListener(object : TextWatcher {

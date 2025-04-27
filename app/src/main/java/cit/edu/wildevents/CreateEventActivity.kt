@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -33,7 +35,6 @@ class CreateEventActivity : AppCompatActivity() {
     private lateinit var pickImagesBtn: ImageButton
     private lateinit var eventNameInput: EditText
     private lateinit var eventLocationInput: EditText
-    private lateinit var eventAddress: EditText
     private lateinit var eventDateAndTimeLayout: LinearLayout
     private lateinit var eventDateText: TextView
     private lateinit var eventTimeText: TextView
@@ -49,7 +50,7 @@ class CreateEventActivity : AppCompatActivity() {
     private var endTime: Calendar? = null
     private var capacity: Int? = null
 
-    private val predefinedTags = listOf("General", "Engr", "Arch", "Cnahs", "CCS", "Crim","Cmba")
+    private val predefinedTags = listOf("Engr", "Arch", "Cnahs", "CCS", "Crim", "Cmba", "Case")
     private val selectedTags = mutableListOf<String>()
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
@@ -118,29 +119,49 @@ class CreateEventActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_date_time_picker, null)
         val dialog = AlertDialog.Builder(this).setView(dialogView).setCancelable(false).create()
 
-        val btnPickDate = dialogView.findViewById<Button>(R.id.btnPickDate)
-        val btnPickStartTime = dialogView.findViewById<Button>(R.id.btnPickStartTime)
-        val btnPickEndTime = dialogView.findViewById<Button>(R.id.btnPickEndTime)
+        val btnPickDate = dialogView.findViewById<LinearLayout>(R.id.btnPickDate)
+        val btnPickStartTime = dialogView.findViewById<LinearLayout>(R.id.btnPickStartTime)
+        val btnPickEndTime = dialogView.findViewById<LinearLayout>(R.id.btnPickEndTime)
+        val tvDate = dialogView.findViewById<TextView>(R.id.event_date)
+        val tvStart = dialogView.findViewById<TextView>(R.id.event_startTime)
+        val tvEnd = dialogView.findViewById<TextView>(R.id.event_endTime)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
 
         val selectedDate = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
+        // Initialize date field with current date
+        tvDate.text = dateFormat.format(selectedDate.time)
+
+        // Date picker
         btnPickDate.setOnClickListener {
             val now = Calendar.getInstance()
             DatePickerDialog(this, { _, year, month, day ->
                 selectedDate.set(Calendar.YEAR, year)
                 selectedDate.set(Calendar.MONTH, month)
                 selectedDate.set(Calendar.DAY_OF_MONTH, day)
+
+                // Update the TextView with selected date
+                tvDate.text = dateFormat.format(selectedDate.time)
+
+                // Optional: clear selected start/end time when date is changed
+                startTime = null
+                endTime = null
+                tvStart.text = ""
+                tvEnd.text = ""
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
 
+        // Time pickers (initialized only when user picks time)
         btnPickStartTime.setOnClickListener {
             val now = Calendar.getInstance()
             TimePickerDialog(this, { _, hour, minute ->
                 startTime = Calendar.getInstance().apply {
                     set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH), hour, minute)
                 }
+                tvStart.text = timeFormat.format(startTime!!.time)
             }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
         }
 
@@ -150,6 +171,7 @@ class CreateEventActivity : AppCompatActivity() {
                 endTime = Calendar.getInstance().apply {
                     set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH), hour, minute)
                 }
+                tvEnd.text = timeFormat.format(endTime!!.time)
             }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
         }
 
@@ -159,11 +181,8 @@ class CreateEventActivity : AppCompatActivity() {
 
         btnConfirm.setOnClickListener {
             if (startTime != null && endTime != null) {
-                val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-                val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-
-                eventDateText.text = dateFormat.format(startTime!!.time)
-                eventTimeText.text = "${timeFormat.format(startTime!!.time)} - ${timeFormat.format(endTime!!.time)}"
+                eventDateText.text = tvDate.text
+                eventTimeText.text = "${tvStart.text} - ${tvEnd.text}"
                 eventDateTime = startTime
                 dialog.dismiss()
             } else {
@@ -171,8 +190,11 @@ class CreateEventActivity : AppCompatActivity() {
             }
         }
 
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         dialog.show()
     }
+
 
     private fun setupTags() {
         tagFlexbox.removeAllViews()
@@ -218,7 +240,6 @@ class CreateEventActivity : AppCompatActivity() {
     private fun createEvent() {
         val eventName = eventNameInput.text.toString().trim()
         val location = eventLocationInput.text.toString().trim()
-        val address = eventAddress.text.toString().trim()
         val description = eventDescriptionInput.text.toString().trim()
 
         if (eventName.isEmpty() || location.isEmpty() || eventDateTime == null || startTime == null || endTime == null) {
@@ -230,12 +251,14 @@ class CreateEventActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         val eventId = db.collection("events").document().id
 
+        val allTags = mutableListOf("General").apply { addAll(selectedTags) }
+
         val eventMap = hashMapOf(
             "id" to eventId,
             "name" to eventName,
             "location" to location,
             "description" to description,
-            "tags" to selectedTags,
+            "tags" to allTags,
             "hostId" to user.id,
             "startTime" to Timestamp(startTime!!.time),
             "endTime" to Timestamp(endTime!!.time),
