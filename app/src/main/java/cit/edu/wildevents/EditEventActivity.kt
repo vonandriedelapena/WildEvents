@@ -1,14 +1,14 @@
 package cit.edu.wildevents
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,22 +17,16 @@ import android.util.Log
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import cit.edu.wildevents.app.MyApplication
-import cit.edu.wildevents.data.Event
-import cit.edu.wildevents.helper.EventsViewModel
+import com.bumptech.glide.Glide
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.google.android.flexbox.FlexboxLayout
-import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
-
-
-class CreateEventActivity : AppCompatActivity() {
+import com.google.firebase.Timestamp
+class EditEventActivity : AppCompatActivity() {
 
     private lateinit var coverImage: ImageView
     private lateinit var pickImagesBtn: ImageButton
@@ -45,26 +39,32 @@ class CreateEventActivity : AppCompatActivity() {
     private lateinit var tagFlexbox: FlexboxLayout
     private lateinit var eventCapacityText: TextView
     private lateinit var requireApprovalSwitch: Switch
-    private lateinit var createEventBtn: Button
+    private lateinit var updateEventBtn: Button
 
     private var imageUri: Uri? = null
+    private var existingCoverImageUrl: String? = null
+
     private var eventDateTime: Calendar? = null
     private var startTime: Calendar? = null
     private var endTime: Calendar? = null
     private var capacity: Int? = null
 
-    private val predefinedTags = listOf("Engr", "Arch", "Cnahs", "CCS", "Crim", "Cmba", "Case")
+    private val predefinedTags = listOf("General", "Engr", "Arch", "Cnahs", "CCS", "Crim", "Cmba")
     private val selectedTags = mutableListOf<String>()
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>
 
+    private lateinit var eventId: String
+    private lateinit var db: FirebaseFirestore
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_eventdesign)
+        setContentView(R.layout.activity_edit_eventdesign)
 
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Initialize views
         coverImage = findViewById(R.id.coverImage)
         pickImagesBtn = findViewById(R.id.pickImagesBtn)
         eventNameInput = findViewById(R.id.eventNameInput)
@@ -76,24 +76,31 @@ class CreateEventActivity : AppCompatActivity() {
         tagFlexbox = findViewById(R.id.tagFlexbox)
         eventCapacityText = findViewById(R.id.eventCapacity)
         requireApprovalSwitch = findViewById(R.id.requireApprovalSwitch)
-        createEventBtn = findViewById(R.id.createEventBtn)
+        updateEventBtn = findViewById(R.id.saveEventBtn)
+
+        db = FirebaseFirestore.getInstance()
 
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
                 val selectedImageUri = result.data?.data
                 imageUri = selectedImageUri
                 coverImage.setImageURI(selectedImageUri)
-                Log.d("CreateEventActivity", "Image selected: $selectedImageUri")
             }
         }
 
+        // Get the eventId passed from previous screen
+        eventId = intent.getStringExtra("eventId") ?: throw IllegalArgumentException("EVENT_ID is required")
+        Log.d("EditEventActivity", "onCreate called")
+
         pickImagesBtn.setOnClickListener { openImagePicker() }
         eventDateAndTimeLayout.setOnClickListener { showDateTimePicker() }
-        createEventBtn.setOnClickListener { createEvent() }
+        updateEventBtn.setOnClickListener { updateEvent() }
 
         setupTags()
         setupCapacityOption()
-        initConfig();
+
+        initConfig()
+        loadEventData()
     }
 
     private fun initConfig() {
@@ -117,54 +124,92 @@ class CreateEventActivity : AppCompatActivity() {
         imagePickerLauncher.launch(intent)
     }
 
+    private fun loadEventData() {
+        db.collection("events").document(eventId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    eventNameInput.setText(document.getString("name"))
+                    eventLocationInput.setText(document.getString("location"))
+                    eventDescriptionInput.setText(document.getString("description"))
+                    existingCoverImageUrl = document.getString("coverImageUrl")
+
+                    document.get("tags")?.let { tags ->
+                        if (tags is List<*>) {
+                            selectedTags.addAll(tags.filterIsInstance<String>())
+                            updateTagSelections()
+                        }
+                    }
+
+                    val capacityValue = document.getLong("capacity")?.toInt()
+                    if (capacityValue != null) {
+                        capacity = capacityValue
+                        eventCapacityText.text = capacity.toString()
+                    } else {
+                        eventCapacityText.text = "Unlimited"
+                    }
+
+                    requireApprovalSwitch.isChecked = document.getBoolean("requiresApproval") == true
+
+                    val startTimestamp = document.getTimestamp("startTime")
+                    val endTimestamp = document.getTimestamp("endTime")
+                    if (startTimestamp != null && endTimestamp != null) {
+                        startTime = Calendar.getInstance().apply { time = startTimestamp.toDate() }
+                        endTime = Calendar.getInstance().apply { time = endTimestamp.toDate() }
+
+                        val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+                        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+                        eventDateText.text = dateFormat.format(startTime!!.time)
+                        eventTimeText.text = "${timeFormat.format(startTime!!.time)} - ${timeFormat.format(endTime!!.time)}"
+                    }
+
+                    // Load the existing image if available
+                    if (!existingCoverImageUrl.isNullOrEmpty()) {
+                        Glide.with(this).load(existingCoverImageUrl).into(coverImage)
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to load event: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun updateTagSelections() {
+        for (i in 0 until tagFlexbox.childCount) {
+            val checkBox = tagFlexbox.getChildAt(i) as? CheckBox
+            checkBox?.isChecked = selectedTags.contains(checkBox?.text.toString())
+        }
+    }
+
     @SuppressLint("InflateParams")
     private fun showDateTimePicker() {
+        // (Same showDateTimePicker() code as in CreateEventActivity)
         val dialogView = layoutInflater.inflate(R.layout.dialog_date_time_picker, null)
         val dialog = AlertDialog.Builder(this).setView(dialogView).setCancelable(false).create()
 
-        val btnPickDate = dialogView.findViewById<LinearLayout>(R.id.btnPickDate)
-        val btnPickStartTime = dialogView.findViewById<LinearLayout>(R.id.btnPickStartTime)
-        val btnPickEndTime = dialogView.findViewById<LinearLayout>(R.id.btnPickEndTime)
-        val tvDate = dialogView.findViewById<TextView>(R.id.event_date)
-        val tvStart = dialogView.findViewById<TextView>(R.id.event_startTime)
-        val tvEnd = dialogView.findViewById<TextView>(R.id.event_endTime)
+        val btnPickDate = dialogView.findViewById<Button>(R.id.btnPickDate)
+        val btnPickStartTime = dialogView.findViewById<Button>(R.id.btnPickStartTime)
+        val btnPickEndTime = dialogView.findViewById<Button>(R.id.btnPickEndTime)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnConfirm = dialogView.findViewById<Button>(R.id.btnConfirm)
 
         val selectedDate = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-        // Initialize date field with current date
-        tvDate.text = dateFormat.format(selectedDate.time)
-
-        // Date picker
         btnPickDate.setOnClickListener {
             val now = Calendar.getInstance()
             DatePickerDialog(this, { _, year, month, day ->
                 selectedDate.set(Calendar.YEAR, year)
                 selectedDate.set(Calendar.MONTH, month)
                 selectedDate.set(Calendar.DAY_OF_MONTH, day)
-
-                // Update the TextView with selected date
-                tvDate.text = dateFormat.format(selectedDate.time)
-
-                // Optional: clear selected start/end time when date is changed
-                startTime = null
-                endTime = null
-                tvStart.text = ""
-                tvEnd.text = ""
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        // Time pickers (initialized only when user picks time)
         btnPickStartTime.setOnClickListener {
             val now = Calendar.getInstance()
             TimePickerDialog(this, { _, hour, minute ->
                 startTime = Calendar.getInstance().apply {
                     set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH), hour, minute)
                 }
-                tvStart.text = timeFormat.format(startTime!!.time)
             }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
         }
 
@@ -174,7 +219,6 @@ class CreateEventActivity : AppCompatActivity() {
                 endTime = Calendar.getInstance().apply {
                     set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH), hour, minute)
                 }
-                tvEnd.text = timeFormat.format(endTime!!.time)
             }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
         }
 
@@ -184,20 +228,19 @@ class CreateEventActivity : AppCompatActivity() {
 
         btnConfirm.setOnClickListener {
             if (startTime != null && endTime != null) {
-                eventDateText.text = tvDate.text
-                eventTimeText.text = "${tvStart.text} - ${tvEnd.text}"
-                eventDateTime = startTime
+                val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+                eventDateText.text = dateFormat.format(startTime!!.time)
+                eventTimeText.text = "${timeFormat.format(startTime!!.time)} - ${timeFormat.format(endTime!!.time)}"
                 dialog.dismiss()
             } else {
                 Toast.makeText(this, "Please select both start and end time", Toast.LENGTH_SHORT).show()
             }
         }
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         dialog.show()
     }
-
 
     private fun setupTags() {
         tagFlexbox.removeAllViews()
@@ -240,162 +283,72 @@ class CreateEventActivity : AppCompatActivity() {
         }
     }
 
-    private fun createEvent() {
+    private fun updateEvent() {
         val eventName = eventNameInput.text.toString().trim()
         val location = eventLocationInput.text.toString().trim()
         val description = eventDescriptionInput.text.toString().trim()
 
-        if (eventName.isEmpty() || location.isEmpty() || eventDateTime == null || startTime == null || endTime == null) {
+        if (eventName.isEmpty() || location.isEmpty() || startTime == null || endTime == null) {
             Toast.makeText(this, "Please complete all required fields", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val user = (application as MyApplication).currentUser ?: return
-        val db = FirebaseFirestore.getInstance()
-        val eventId = db.collection("events").document().id
-
-        val allTags = mutableListOf("General").apply { addAll(selectedTags) }
-
-        val eventMap = hashMapOf(
-            "id" to eventId,
+        val eventMap = hashMapOf<String, Any?>(
             "name" to eventName,
             "location" to location,
             "description" to description,
-            "tags" to allTags,
-            "hostId" to user.id,
+            "tags" to selectedTags,
             "startTime" to Timestamp(startTime!!.time),
             "endTime" to Timestamp(endTime!!.time),
             "capacity" to capacity,
             "requiresApproval" to requireApprovalSwitch.isChecked
         )
 
-        val imageUri = this.imageUri
-        if (imageUri == null) {
-            Log.d("CreateEventActivity", "No image selected. Saving event without image.")
-            saveEventToFirestore(db, eventId, eventMap)
-        } else {
+        if (imageUri == null && existingCoverImageUrl != null) {
+            saveUpdatedEvent(eventMap)
+        } else if (imageUri != null) {
             MediaManager.get().upload(imageUri)
                 .option("folder", "event_covers/")
                 .option("resource_type", "image")
                 .callback(object : com.cloudinary.android.callback.UploadCallback {
-                    override fun onStart(requestId: String?) {
-                        Log.d("CreateEventActivity", "Cloudinary upload started: $requestId")
-                    }
-
-                    override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {
-                        Log.d("CreateEventActivity", "Upload progress: $bytes / $totalBytes")
-                    }
-
+                    override fun onStart(requestId: String?) {}
+                    override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {}
                     override fun onSuccess(requestId: String?, resultData: MutableMap<Any?, Any?>?) {
                         val imageUrl = resultData?.get("secure_url") as? String
-                        Log.d("CreateEventActivity", "Cloudinary upload successful: $imageUrl")
                         eventMap["coverImageUrl"] = imageUrl
-                        saveEventToFirestore(db, eventId, eventMap)
+                        saveUpdatedEvent(eventMap)
                     }
-
                     override fun onError(requestId: String?, error: ErrorInfo?) {
-                        Log.e("CreateEventActivity", "Cloudinary upload failed: ${error?.description}")
-                        Toast.makeText(this@CreateEventActivity, "Upload failed: ${error?.description}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@EditEventActivity, "Image upload failed", Toast.LENGTH_SHORT).show()
                     }
-
-                    override fun onReschedule(requestId: String?, error: ErrorInfo?) {
-                        Log.w("CreateEventActivity", "Cloudinary upload rescheduled: ${error?.description}")
-                        Toast.makeText(this@CreateEventActivity, "Upload rescheduled: ${error?.description}", Toast.LENGTH_SHORT).show()
-                    }
-
+                    override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
                 })
                 .dispatch()
+        } else {
+            saveUpdatedEvent(eventMap)
         }
-
-        // Check and request exact alarm permission
-        checkAndRequestExactAlarmPermission()
-
-        // Schedule a reminder 1 hour before the event
-        scheduleNotification(startTime!!, eventName)
     }
 
-
-    private fun saveEventToFirestore(db: FirebaseFirestore, eventId: String, eventMap: HashMap<String, Any?>) {
-        db.collection("events").document(eventId).set(eventMap)
+    private fun saveUpdatedEvent(eventMap: HashMap<String, Any?>) {
+        db.collection("events").document(eventId).update(eventMap as Map<String, Any>)
             .addOnSuccessListener {
-                val event = Event(
-                    eventId = eventId,
-                    eventName = eventMap["name"] as String,
-                    startTime = (eventMap["startTime"] as Timestamp).toDate().time,
-                    endTime = (eventMap["endTime"] as Timestamp).toDate().time,
-                    location = eventMap["location"] as String,
-                    description = eventMap["description"] as String,
-                    imageUrl = eventMap["coverImageUrl"] as? String,
-                    hostId = eventMap["hostId"] as String,
-                    tags = eventMap["tags"] as List<String>,
-                    capacity = eventMap["capacity"] as? Int
-                )
+                Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show()
+                // After updating the event in Firestore
+                val updatedIntent = Intent()
+                updatedIntent.putExtra("eventId", eventId) // Pass the eventId
+                updatedIntent.putExtra("eventName", eventNameInput.text.toString())
+                updatedIntent.putExtra("description", eventDescriptionInput.text.toString())
+                updatedIntent.putExtra("startTime", startTime?.time)
+                updatedIntent.putExtra("endTime", endTime?.time)
+                updatedIntent.putExtra("location", eventLocationInput.text.toString())
+                updatedIntent.putExtra("imageUrl", existingCoverImageUrl.toString())
 
-                // ✅ Automatically RSVP the host (creator)
-                val user = (application as MyApplication).currentUser
-                if (user != null) {
-                    val attendeeData = mapOf(
-                        "eventId" to eventId,
-                        "userId" to user.id,
-                        "timestamp" to Timestamp.now()
-                    )
-                    db.collection("attendee").add(attendeeData)
-                        .addOnSuccessListener {
-                            Log.d("CreateEventActivity", "Host RSVP saved in attendee")
-                        }
-                        .addOnFailureListener {
-                            Log.w("CreateEventActivity", "Failed to RSVP host: ${it.message}")
-                        }
-                }
-
-                // Add to local ViewModel
-                val viewModel = ViewModelProvider(this@CreateEventActivity)[EventsViewModel::class.java]
-                viewModel.addEvent(event)
-
-                Toast.makeText(this, "Event created successfully", Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_OK, updatedIntent)
                 finish()
+
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to create event: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
             }
-    }
-
-
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
-    private fun scheduleNotification(startTime: Calendar, eventName: String) {
-        val intent = Intent(this, ReminderReceiver::class.java).apply {
-            putExtra("title", "Upcoming Event")
-            putExtra("message", "$eventName is starting soon!")
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            startTime.timeInMillis.toInt(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            startTime.timeInMillis - 60 * 60 * 1000, // 10 minutes before event
-            pendingIntent
-        )
-    }
-
-
-    private fun checkAndRequestExactAlarmPermission() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            if (!alarmManager.canScheduleExactAlarms()) {
-                // Guide the user to the app settings to enable the permission
-                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                startActivity(intent)
-            }
-        }
     }
 }

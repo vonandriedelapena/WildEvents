@@ -14,7 +14,6 @@ import com.csit284.myapplication.utils.toast
  * the list of skills is displayed in a Simple ListView.
  */
 class SettingsAboutDevelopers : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.screen_developer)

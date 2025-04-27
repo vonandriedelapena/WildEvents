@@ -29,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="250dp"
+        android:layout_marginBottom="50dp"
         android:fillViewport="true"
         android:background="@drawable/background_rounded">
 
@@ -168,8 +169,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="74dp">
+                android:layout_marginTop="12dp">
 
                 <ImageView
                     android:id="@+id/event_host_pic"
@@ -188,6 +188,55 @@
 
             </LinearLayout>
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Comments"
+                android:editable="false"
+                android:layout_marginTop="16dp"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+                <!-- RecyclerView for Comments -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/comments_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scrollbars="vertical"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Add Comment Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/comment_input"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="Write a comment..."
+                        android:padding="8dp"
+                        android:textSize="15dp"
+                        android:background="@drawable/edittext_background" />
+
+                    <Button
+                        android:id="@+id/post_comment_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Post"
+                        android:layout_marginStart="8dp"
+                        android:backgroundTint="#333333"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

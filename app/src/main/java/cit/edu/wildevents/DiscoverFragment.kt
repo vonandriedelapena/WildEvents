@@ -17,6 +17,10 @@ import cit.edu.wildevents.data.TimeFilterMode
 import cit.edu.wildevents.helper.EventsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+/**
+ * The app uses fragments to display different screens while maintaining a navigation bar static at the bottom.
+ * This fragment displays a list of events for the users using a Custom ListView
+ */
 class DiscoverFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView

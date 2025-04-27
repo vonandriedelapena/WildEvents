@@ -1,9 +1,12 @@
 package cit.edu.wildevents
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.Typeface.BOLD
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.*
@@ -13,11 +16,20 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.google.firebase.firestore.FirebaseFirestore
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cit.edu.wildevents.app.MyApplication
 import com.google.firebase.firestore.FieldPath
+import cit.edu.wildevents.data.Comment
+import cit.edu.wildevents.data.User
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -30,19 +42,34 @@ class EventDetailActivity : AppCompatActivity() {
     private lateinit var hostTextView: TextView
     private lateinit var hostImageView: ImageView
     private lateinit var joinButton: Button
+    private lateinit var participantsContainer: LinearLayout
+    private lateinit var commentsRecyclerView: RecyclerView
+    private lateinit var commentAdapter: CommentAdapter
+
     private lateinit var attendeesLayout: LinearLayout
     private var attendeeDocId: String? = null
+    private var eventId: String? = null
+    private var currentUser: User? = null
 
+    private lateinit var editEventLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.event_details)
 
-        // Set toolbar
-        setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        initViews()
+        setupToolbar()
 
-        // View references
+        eventId = intent.getStringExtra("eventId")
+        currentUser = (application as MyApplication).currentUser
+
+        setupEditEventLauncher()
+
+        loadEventDetails()
+        setupCommentsSection()
+    }
+
+    private fun initViews() {
         imageView = findViewById(R.id.event_detail_image)
         titleTextView = findViewById(R.id.event_detail_title)
         descriptionTextView = findViewById(R.id.event_detail_description)
@@ -53,36 +80,99 @@ class EventDetailActivity : AppCompatActivity() {
         hostImageView = findViewById(R.id.event_host_pic)
         joinButton = findViewById(R.id.joinBtn)
         attendeesLayout = findViewById(R.id.attendeesLayout)
+        participantsContainer = findViewById(R.id.participants_container)
+        commentsRecyclerView = findViewById(R.id.comments_recycler_view)
+    }
 
-        // Get data from Intent
-        val eventName = intent.getStringExtra("eventName")
-        val description = intent.getStringExtra("description")
-        val startTime = intent.getLongExtra("startTime", -1)
-        val endTime = intent.getLongExtra("endTime", -1)
-        val location = intent.getStringExtra("location")
-        val hostId = intent.getStringExtra("hostId")
-        val imageUrl = intent.getStringExtra("imageUrl")
-        val eventId = intent.getStringExtra("eventId")
-        val currentUser = (application as MyApplication).currentUser
+    private fun setupToolbar() {
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
 
-        // Bind data
+    private fun setupEditEventLauncher() {
+        editEventLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val updatedEventId = result.data?.getStringExtra("eventId") ?: eventId
+                val updatedEventName = result.data?.getStringExtra("eventName")
+                val updatedDescription = result.data?.getStringExtra("description")
+                val updatedStartTime = result.data?.getLongExtra("startTime", -1L) ?: -1L
+                val updatedEndTime = result.data?.getLongExtra("endTime", -1L) ?: -1L
+                val updatedLocation = result.data?.getStringExtra("location")
+                val updatedImageUrl = result.data?.getStringExtra("imageUrl")
+
+                // Now update the UI with the new details
+                if (updatedEventId != null) {
+                    eventId = updatedEventId
+                }
+                loadUpdatedEventDetails(updatedEventName, updatedDescription, updatedStartTime, updatedEndTime, updatedLocation, updatedImageUrl)
+            }
+        }
+    }
+
+    private fun loadUpdatedEventDetails(eventName: String?, description: String?, startTime: Long, endTime: Long, location: String?, imageUrl: String?) {
         titleTextView.text = eventName
         descriptionTextView.text = description
         locationTextView.text = location
+        formatDateTime(startTime, endTime)
+        loadEventImage(imageUrl)
 
-        // Fetch and display host details
+        // Optionally, you could also re-fetch the host info and participants after an event update
+        // Re-fetch and show Host Info if needed
+        if (!eventId.isNullOrEmpty()) {
+            loadHostInfo(eventId!!)
+        }
+
+        // Load Comments
+        loadCommentsForEvent(eventId)
+    }
+
+
+    private fun loadEventDetails() {
+        if (eventId == null || currentUser == null) {
+            Toast.makeText(this, "Missing event or user info.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        // Get Intent Extras
+        val extras = intent.extras
+        val eventName = extras?.getString("eventName")
+        val description = extras?.getString("description")
+        val startTime = extras?.getLong("startTime") ?: -1
+        val endTime = extras?.getLong("endTime") ?: -1
+        val location = extras?.getString("location")
+        val hostId = extras?.getString("hostId")
+        val imageUrl = extras?.getString("imageUrl")
+
+        // Populate Basic Info
+        titleTextView.text = eventName
+        descriptionTextView.text = description
+        locationTextView.text = location
+        formatDateTime(startTime, endTime)
+        loadEventImage(imageUrl)
+
+        // Fetch and show Host Info
         if (!hostId.isNullOrEmpty()) {
-            FirebaseFirestore.getInstance()
-                .collection("users") // Assuming your users collection is called "users"
-                .document(hostId)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document != null && document.exists()) {
-                        val firstName = document.getString("firstName") ?: ""
-                        val lastName = document.getString("lastName") ?: ""
-                        val profilePic = document.getString("profilePic") ?: "default.png"
+            loadHostInfo(hostId)
+        }
 
-                        hostTextView.text = "$firstName $lastName"
+        // Setup Button
+        setupJoinOrEditButton(hostId)
+
+        // Load Comments
+        loadCommentsForEvent(eventId)
+    }
+
+    private fun loadHostInfo(hostId: String) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(hostId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val firstName = document.getString("firstName") ?: ""
+                    val lastName = document.getString("lastName") ?: ""
+                    hostTextView.text = "$firstName $lastName"
 
                         // Load profile pic
                         if (profilePic.startsWith("http")) {
@@ -112,10 +202,52 @@ class EventDetailActivity : AppCompatActivity() {
         }
 
         if (eventId != null && currentUser != null) {
+                    val profilePic = document.getString("profilePic") ?: "default.png"
+                    loadImageIntoView(profilePic, hostImageView, R.drawable.ic_user)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to load host info.", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun loadImageIntoView(url: String, imageView: ImageView, defaultResId: Int) {
+        if (url.startsWith("http")) {
+            Glide.with(this).load(url).placeholder(defaultResId).into(imageView)
+        } else {
+            val resId = resources.getIdentifier(url.substringBeforeLast('.'), "drawable", packageName)
+            imageView.setImageResource(if (resId != 0) resId else defaultResId)
+        }
+    }
+
+    private fun formatDateTime(start: Long, end: Long) {
+        if (start > 0 && end > 0) {
+            val dateFormatter = SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault())
+            val timeFormatter = SimpleDateFormat("h:mma", Locale.getDefault())
+            dateTextView.text = dateFormatter.format(Date(start))
+            timeTextView.text = "${timeFormatter.format(Date(start))} - ${timeFormatter.format(Date(end))}"
+        }
+    }
+
+    private fun loadEventImage(imageUrl: String?) {
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.placeholder_image)
+                .into(imageView)
+        } else {
+            imageView.setImageResource(R.drawable.placeholder_image)
+        }
+    }
+
+    private fun setupJoinOrEditButton(hostId: String?) {
+        if (currentUser!!.isHost && currentUser!!.id == hostId) {
+            setButtonToEdit()
+        } else {
             FirebaseFirestore.getInstance()
                 .collection("attendee")
                 .whereEqualTo("eventId", eventId)
-                .whereEqualTo("userId", currentUser.id)
+                .whereEqualTo("userId", currentUser!!.id)
                 .get()
                 .addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
@@ -168,56 +300,123 @@ class EventDetailActivity : AppCompatActivity() {
 
         // Button action
         joinButton.setOnClickListener {
-            if (eventId != null && currentUser != null) {
-                val db = FirebaseFirestore.getInstance()
-
-                if (attendeeDocId == null) {
-                    // Not attending → Join
-                    val attendeeData = mapOf(
-                        "eventId" to eventId,
-                        "userId" to currentUser.id,
-                    )
-
-                    db.collection("attendee")
-                        .add(attendeeData)
-                        .addOnSuccessListener { docRef ->
-                            attendeeDocId = docRef.id
-                            Toast.makeText(this, "You joined the event!", Toast.LENGTH_SHORT).show()
-                            setButtonToGoing()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(this, "Failed to join event.", Toast.LENGTH_SHORT).show()
-                        }
-                } else {
-                    // Already attending → Confirm cancel
-                    AlertDialog.Builder(this)
-                        .setTitle("Leave Event?")
-                        .setMessage("Are you sure you want to cancel your RSVP?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            db.collection("attendee")
-                                .document(attendeeDocId!!)
-                                .delete()
-                                .addOnSuccessListener {
-                                    attendeeDocId = null
-                                    Toast.makeText(this, "You left the event.", Toast.LENGTH_SHORT).show()
-                                    setButtonToJoin()
-                                }
-                                .addOnFailureListener {
-                                    Toast.makeText(this, "Failed to leave event.", Toast.LENGTH_SHORT).show()
-                                }
-                        }
-                        .setNegativeButton("No", null)
-                        .show()
-                }
+            if (currentUser!!.isHost && currentUser!!.id == hostId) {
+                val intent = Intent(this, EditEventActivity::class.java)
+                intent.putExtra("eventId", eventId)
+                editEventLauncher.launch(intent)
             } else {
-                Toast.makeText(this, "Missing user or event info.", Toast.LENGTH_SHORT).show()
+                handleJoinOrLeaveEvent()
             }
         }
-
-
     }
 
-    fun setButtonToGoing() {
+    private fun handleJoinOrLeaveEvent() {
+        val db = FirebaseFirestore.getInstance()
+
+        if (attendeeDocId == null) {
+            val attendeeData = mapOf(
+                "eventId" to eventId,
+                "userId" to currentUser!!.id
+            )
+
+            db.collection("attendee")
+                .add(attendeeData)
+                .addOnSuccessListener { docRef ->
+                    attendeeDocId = docRef.id
+                    Toast.makeText(this, "You joined the event!", Toast.LENGTH_SHORT).show()
+                    setButtonToGoing()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Failed to join event.", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Leave Event?")
+                .setMessage("Are you sure you want to cancel your RSVP?")
+                .setPositiveButton("Yes") { _, _ ->
+                    db.collection("attendee")
+                        .document(attendeeDocId!!)
+                        .delete()
+                        .addOnSuccessListener {
+                            attendeeDocId = null
+                            Toast.makeText(this, "You left the event.", Toast.LENGTH_SHORT).show()
+                            setButtonToJoin()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Failed to leave event.", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .setNegativeButton("No", null)
+                .show()
+        }
+    }
+
+    private fun setupCommentsSection() {
+        commentAdapter = CommentAdapter(mutableListOf())
+        commentsRecyclerView.adapter = commentAdapter
+        commentsRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        findViewById<Button>(R.id.post_comment_button).setOnClickListener {
+            val commentInput = findViewById<EditText>(R.id.comment_input)
+            val content = commentInput.text.toString().trim()
+            if (content.isNotEmpty()) {
+                postComment(content)
+            }
+        }
+    }
+
+    private fun postComment(content: String) {
+        if (currentUser != null && eventId != null) {
+            val commentData = mapOf(
+                "eventId" to eventId,
+                "userId" to currentUser!!.id,
+                "userName" to currentUser!!.firstName,
+                "userAvatarUrl" to currentUser!!.profilePic,
+                "content" to content,
+                "timestamp" to FieldValue.serverTimestamp()
+            )
+
+            FirebaseFirestore.getInstance()
+                .collection("comments")
+                .add(commentData)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Comment posted!", Toast.LENGTH_SHORT).show()
+                    loadCommentsForEvent(eventId)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Failed to post comment: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun loadCommentsForEvent(eventId: String?) {
+        FirebaseFirestore.getInstance()
+            .collection("comments")
+            .whereEqualTo("eventId", eventId)
+            .get()
+            .addOnSuccessListener { result ->
+                val comments = result.mapNotNull { doc ->
+                    val timestamp = doc.getTimestamp("timestamp")?.toDate()?.time
+                    if (timestamp != null) {
+                        Comment(
+                            id = doc.id,
+                            userName = doc.getString("userName") ?: "Unknown",
+                            userAvatarUrl = doc.getString("userAvatarUrl"),
+                            content = doc.getString("content") ?: "",
+                            timestamp = timestamp
+                        )
+                    } else null
+                }.sortedBy { it.timestamp }
+
+                commentAdapter.updateComments(comments)
+                commentsRecyclerView.scrollToPosition(comments.size - 1)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error loading comments: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun setButtonToGoing() {
         joinButton.text = "Going"
         joinButton.setBackgroundColor(getColor(android.R.color.holo_green_dark))
     }
@@ -225,6 +424,14 @@ class EventDetailActivity : AppCompatActivity() {
     fun setButtonToJoin() {
         joinButton.text = "Join Now"
         joinButton.setBackgroundColor(Color.parseColor("#333333")) // properly parsed hex color
+    private fun setButtonToJoin() {
+        joinButton.text = "Join Event"
+        joinButton.setBackgroundColor(Color.parseColor("#333333"))
+    }
+
+    private fun setButtonToEdit() {
+        joinButton.text = "Edit Event"
+        joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -284,6 +491,8 @@ class EventDetailActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 
 }
