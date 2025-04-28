@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         wishlistButton.setOnClickListener {
-            switchFragment(WishlistFragment())
+            switchFragment(YourEventsFragment())
             updateSelectedButton(wishlistButton, R.drawable.ic_heart)
         }
 

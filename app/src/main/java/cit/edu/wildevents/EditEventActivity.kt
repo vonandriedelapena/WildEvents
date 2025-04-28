@@ -351,4 +351,9 @@ class EditEventActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to update event", Toast.LENGTH_SHORT).show()
             }
     }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 }

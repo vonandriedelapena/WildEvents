@@ -12,6 +12,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
@@ -48,34 +50,107 @@ class YourEventAdapter(private val context: Context) :
         val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val db = FirebaseFirestore.getInstance()
 
-        holder.eventTitle.text = event.eventName
-        holder.eventDateTime.text = (formatter.format(event.startTime)).trim()
+        holder.attendeesLayout.removeAllViews()
+
+        holder.eventTitle.text = event.eventName.trim()
+        holder.eventDateTime.text = formatter.format(event.startTime)
         holder.eventLocation.text = event.location
 
         if (!event.imageUrl.isNullOrEmpty()) {
-            Glide.with(context)
-                .load(event.imageUrl)
-                .into(holder.eventImage)
+            Glide.with(context).load(event.imageUrl).into(holder.eventImage)
         } else {
             holder.eventImage.setImageResource(R.drawable.placeholder_image)
         }
 
-        db.collection("attendee")
-            .whereEqualTo("eventId", event.eventId)
-            .get()
-            .addOnSuccessListener { attendeeDocuments ->
-                val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
-                if (userIds.isEmpty()) return@addOnSuccessListener
+        val currentUser = (context.applicationContext as cit.edu.wildevents.app.MyApplication).currentUser
 
-                db.collection("users")
-                    .whereIn(FieldPath.documentId(), userIds.take(10))
+        if (currentUser != null) {
+            val isHostOfThisEvent = currentUser.isHost && currentUser.id == event.hostId
+
+            if (isHostOfThisEvent) {
+                // Host of this event
+                setButtonToEdit(holder)
+
+                holder.joinButton.setOnClickListener {
+                    val intent = Intent(context, cit.edu.wildevents.EditEventActivity::class.java)
+                    intent.putExtra("eventId", event.eventId)
+                    context.startActivity(intent)
+                }
+
+                // 👉 DO NOT fetch or show attendees for their own event
+            } else {
+                // Normal user or host viewing other events
+
+                // Check RSVP status
+                db.collection("attendee")
+                    .whereEqualTo("eventId", event.eventId)
+                    .whereEqualTo("userId", currentUser.id)
                     .get()
-                    .addOnSuccessListener { userDocuments ->
-                        val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
-                        displayAttendees(holder.attendeesLayout, profilePics, totalCount = userIds.size)
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            val attendeeDocId = documents.documents[0].id
+                            setButtonToGoing(holder)
+
+                            holder.joinButton.setOnClickListener {
+                                AlertDialog.Builder(context)
+                                    .setTitle("Cancel RSVP")
+                                    .setMessage("Should I cancel your RSVP?")
+                                    .setPositiveButton("Yes") { _, _ ->
+                                        db.collection("attendee")
+                                            .document(attendeeDocId)
+                                            .delete()
+                                            .addOnSuccessListener {
+                                                setButtonToJoin(holder)
+                                                Toast.makeText(context, "You left the event.", Toast.LENGTH_SHORT).show()
+                                            }
+                                            .addOnFailureListener {
+                                                Toast.makeText(context, "Failed to leave event.", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }
+                                    .setNegativeButton("No", null)
+                                    .show()
+                            }
+                        } else {
+                            setButtonToJoin(holder)
+
+                            holder.joinButton.setOnClickListener {
+                                val attendeeData = mapOf(
+                                    "eventId" to event.eventId,
+                                    "userId" to currentUser.id
+                                )
+                                db.collection("attendee")
+                                    .add(attendeeData)
+                                    .addOnSuccessListener {
+                                        setButtonToGoing(holder)
+                                        Toast.makeText(context, "You joined the event!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "Failed to join event.", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                        }
+                    }
+
+                // 👉 Fetch attendees normally (only if not the host of this event)
+                db.collection("attendee")
+                    .whereEqualTo("eventId", event.eventId)
+                    .get()
+                    .addOnSuccessListener { attendeeDocuments ->
+                        val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
+                        if (userIds.isEmpty()) return@addOnSuccessListener
+
+                        db.collection("users")
+                            .whereIn(FieldPath.documentId(), userIds.take(10))
+                            .get()
+                            .addOnSuccessListener { userDocuments ->
+                                val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
+                                displayAttendees(holder.attendeesLayout, profilePics, totalCount = userIds.size)
+                            }
                     }
             }
+        }
 
+        // Open Event Detail when clicking card
         holder.itemView.setOnClickListener {
             val intent = Intent(context, EventDetailActivity::class.java).apply {
                 putExtra("eventId", event.eventId)
@@ -92,6 +167,24 @@ class YourEventAdapter(private val context: Context) :
             context.startActivity(intent)
         }
     }
+
+
+
+    private fun setButtonToGoing(holder: YourEventViewHolder) {
+        holder.joinButton.text = "Going"
+        holder.joinButton.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
+    }
+
+    private fun setButtonToJoin(holder: YourEventViewHolder) {
+        holder.joinButton.text = "Join Event"
+        holder.joinButton.setBackgroundColor(Color.parseColor("#333333"))
+    }
+
+    private fun setButtonToEdit(holder: YourEventViewHolder) {
+        holder.joinButton.text = "Edit Event"
+        holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
+    }
+
 
     override fun getItemCount(): Int = events.size
 
@@ -154,7 +247,7 @@ class YourEventAdapter(private val context: Context) :
                     gravity = Gravity.CENTER
                     background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border) // better visibility
                     setTextColor(Color.WHITE)
-                    textSize = 16f
+                    textSize = 14f
                     setTypeface(null, Typeface.BOLD)
                 }
                 attendeesLayout.addView(moreView)

@@ -43,8 +43,27 @@ class YourEventsFragment : Fragment() {
         viewModel.setTimeFilterMode(TimeFilterMode.UPCOMING)
 
         viewModel.events.observe(viewLifecycleOwner) { filteredEvents ->
-            adapter.updateEvents(filteredEvents)
+            val currentUser = (requireContext().applicationContext as cit.edu.wildevents.app.MyApplication).currentUser
+            if (currentUser != null) {
+                val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+                db.collection("attendee")
+                    .whereEqualTo("userId", currentUser.id)
+                    .get()
+                    .addOnSuccessListener { attendeeDocs ->
+                        val goingEventIds = attendeeDocs.mapNotNull { it.getString("eventId") }
+
+                        val yourEvents = filteredEvents.filter { event ->
+                            event.hostId == currentUser.id || goingEventIds.contains(event.eventId)
+                        }
+
+                        adapter.updateEvents(yourEvents)
+                    }
+            } else {
+                adapter.updateEvents(emptyList())
+            }
         }
+
 
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {

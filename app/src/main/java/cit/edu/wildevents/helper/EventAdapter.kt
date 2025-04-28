@@ -85,65 +85,69 @@ class EventAdapter(private val context: Context) :
         val currentUser = (context.applicationContext as cit.edu.wildevents.app.MyApplication).currentUser
 
         if (currentUser != null) {
-            db.collection("attendee")
-                .whereEqualTo("eventId", event.eventId)
-                .whereEqualTo("userId", currentUser.id)
-                .get()
-                .addOnSuccessListener { documents ->
-                    if (!documents.isEmpty) {
-                        // Already joined
-                        holder.joinButton.text = "Going"
-                        holder.joinButton.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
-                        val attendeeDocId = documents.documents[0].id
+            if (currentUser.isHost && currentUser.id == event.hostId) {
+                // Host user, show Edit Event
+                holder.joinButton.text = "Edit Event"
+                holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
+                holder.joinButton.setOnClickListener {
+                    val intent = Intent(context, cit.edu.wildevents.EditEventActivity::class.java)
+                    intent.putExtra("eventId", event.eventId)
+                    context.startActivity(intent)
+                }
+            } else {
+                // Not host, check if already RSVP'd
+                db.collection("attendee")
+                    .whereEqualTo("eventId", event.eventId)
+                    .whereEqualTo("userId", currentUser.id)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            val attendeeDocId = documents.documents[0].id
+                            setButtonToGoing(holder)
 
-                        holder.joinButton.setOnClickListener {
-                            // Show confirmation dialog before leaving
-                            AlertDialog.Builder(context)
-                                .setTitle("Cancel RSVP")
-                                .setMessage("Should I cancel your RSVP?")
-                                .setPositiveButton("Yes") { _, _ ->
-                                    db.collection("attendee")
-                                        .document(attendeeDocId)
-                                        .delete()
-                                        .addOnSuccessListener {
-                                            holder.joinButton.text = "Join Now"
-                                            holder.joinButton.setBackgroundColor(Color.parseColor("#333333"))
-                                            Toast.makeText(context, "You left the event.", Toast.LENGTH_SHORT).show()
-                                        }
-                                        .addOnFailureListener {
-                                            Toast.makeText(context, "Failed to leave event.", Toast.LENGTH_SHORT).show()
-                                        }
-                                }
-                                .setNegativeButton("No", null)
-                                .show()
-                        }
-                    } else {
-                        // Not yet joined
-                        holder.joinButton.text = "Join Now"
-                        holder.joinButton.setBackgroundColor(Color.parseColor("#333333"))
+                            holder.joinButton.setOnClickListener {
+                                // Confirm leaving event
+                                AlertDialog.Builder(context)
+                                    .setTitle("Cancel RSVP")
+                                    .setMessage("Should I cancel your RSVP?")
+                                    .setPositiveButton("Yes") { _, _ ->
+                                        db.collection("attendee")
+                                            .document(attendeeDocId)
+                                            .delete()
+                                            .addOnSuccessListener {
+                                                setButtonToJoin(holder)
+                                                Toast.makeText(context, "You left the event.", Toast.LENGTH_SHORT).show()
+                                            }
+                                            .addOnFailureListener {
+                                                Toast.makeText(context, "Failed to leave event.", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }
+                                    .setNegativeButton("No", null)
+                                    .show()
+                            }
+                        } else {
+                            // Not joined yet
+                            setButtonToJoin(holder)
 
-                        holder.joinButton.setOnClickListener {
-                            // Join event immediately
-                            val attendeeData = mapOf(
-                                "eventId" to event.eventId,
-                                "userId" to currentUser.id
-                            )
-
-                            db.collection("attendee")
-                                .add(attendeeData)
-                                .addOnSuccessListener {
-                                    holder.joinButton.text = "Going"
-                                    holder.joinButton.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
-                                    Toast.makeText(context, "You joined the event!", Toast.LENGTH_SHORT).show()
-                                }
-                                .addOnFailureListener {
-                                    Toast.makeText(context, "Failed to join event.", Toast.LENGTH_SHORT).show()
-                                }
+                            holder.joinButton.setOnClickListener {
+                                val attendeeData = mapOf(
+                                    "eventId" to event.eventId,
+                                    "userId" to currentUser.id
+                                )
+                                db.collection("attendee")
+                                    .add(attendeeData)
+                                    .addOnSuccessListener {
+                                        setButtonToGoing(holder)
+                                        Toast.makeText(context, "You joined the event!", Toast.LENGTH_SHORT).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "Failed to join event.", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
                         }
                     }
-                }
+            }
         }
-
 
         // Open Event Details when clicking the whole card
         holder.itemView.setOnClickListener {
@@ -162,6 +166,7 @@ class EventAdapter(private val context: Context) :
             context.startActivity(intent)
         }
     }
+
 
 
     override fun getItemCount(): Int = events.size
@@ -208,19 +213,35 @@ class EventAdapter(private val context: Context) :
             val remainingCount = totalCount - maxVisiblePfps
             if (remainingCount > 0) {
                 val moreView = TextView(context).apply {
-                    text = "+$remainingCount"
-                    gravity = Gravity.CENTER
                     layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
                         marginStart = overlapMargin
                     }
-                    background = ContextCompat.getDrawable(context, R.drawable.background_circle)
-                    setTextColor(Color.BLACK)
-                    textSize = 16f
+                    text = "+$remainingCount"
+                    gravity = Gravity.CENTER
+                    background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border) // better visibility
+                    setTextColor(Color.WHITE)
+                    textSize = 14f
+                    setTypeface(null, Typeface.BOLD)
                 }
 
                 attendeesLayout.addView(moreView)
             }
         }
+    }
+
+    private fun setButtonToGoing(holder: EventViewHolder) {
+        holder.joinButton.text = "Going"
+        holder.joinButton.setBackgroundColor(Color.parseColor("#388E3C"))
+    }
+
+    private fun setButtonToJoin(holder: EventViewHolder) {
+        holder.joinButton.text = "Join Event"
+        holder.joinButton.setBackgroundColor(Color.parseColor("#333333"))
+    }
+
+    private fun setButtonToEdit(holder: EventViewHolder) {
+        holder.joinButton.text = "Edit Event"
+        holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
     }
 
 }

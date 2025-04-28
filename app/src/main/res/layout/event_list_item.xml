@@ -120,7 +120,7 @@ title, date, and description -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Going"
+                    android:text="Joined"
                     android:textColor="#388E3C"
                     />
 
@@ -135,14 +135,12 @@ title, date, and description -->
 
                 <Button
                     android:id="@+id/btnConfirm"
-                    android:layout_width="125dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:backgroundTint="@color/black"
                     android:drawableTint="@color/black"
-
                     android:textSize="12dp"
-                    android:text="Join now"
-                    android:layout_marginStart="16dp" />
+                    android:text="Join now"/>
 
 
             </LinearLayout>

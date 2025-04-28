@@ -80,7 +80,6 @@ class EventDetailActivity : AppCompatActivity() {
         hostImageView = findViewById(R.id.event_host_pic)
         joinButton = findViewById(R.id.joinBtn)
         attendeesLayout = findViewById(R.id.attendeesLayout)
-        participantsContainer = findViewById(R.id.participants_container)
         commentsRecyclerView = findViewById(R.id.comments_recycler_view)
     }
 
@@ -151,6 +150,26 @@ class EventDetailActivity : AppCompatActivity() {
         formatDateTime(startTime, endTime)
         loadEventImage(imageUrl)
 
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("attendee")
+            .whereEqualTo("eventId", eventId)
+            .get()
+            .addOnSuccessListener { attendeeDocuments ->
+                val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
+
+                if (userIds.isEmpty()) return@addOnSuccessListener
+
+                // Now fetch users' profile pics
+                db.collection("users")
+                    .whereIn(FieldPath.documentId(), userIds.take(10)) // Firestore 'whereIn' limit is 10
+                    .get()
+                    .addOnSuccessListener { userDocuments ->
+                        val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
+                        displayAttendees(profilePics, totalCount = userIds.size)
+                    }
+            }
+
         // Fetch and show Host Info
         if (!hostId.isNullOrEmpty()) {
             loadHostInfo(hostId)
@@ -172,8 +191,10 @@ class EventDetailActivity : AppCompatActivity() {
                 if (document != null && document.exists()) {
                     val firstName = document.getString("firstName") ?: ""
                     val lastName = document.getString("lastName") ?: ""
+                    val profilePic = document.getString("profilePic") ?: "default.png"
                     hostTextView.text = "$firstName $lastName"
 
+                    loadImageIntoView(profilePic, hostImageView, R.drawable.ic_user)
                         // Load profile pic
                         if (profilePic.startsWith("http")) {
                             Glide.with(this)
@@ -200,16 +221,6 @@ class EventDetailActivity : AppCompatActivity() {
                     Toast.makeText(this, "Failed to load host info", Toast.LENGTH_SHORT).show()
                 }
         }
-
-        if (eventId != null && currentUser != null) {
-                    val profilePic = document.getString("profilePic") ?: "default.png"
-                    loadImageIntoView(profilePic, hostImageView, R.drawable.ic_user)
-                }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to load host info.", Toast.LENGTH_SHORT).show()
-            }
-    }
 
     private fun loadImageIntoView(url: String, imageView: ImageView, defaultResId: Int) {
         if (url.startsWith("http")) {
@@ -258,44 +269,6 @@ class EventDetailActivity : AppCompatActivity() {
                     }
                 }
         }
-
-        // Format and display date/time
-        if (startTime > 0 && endTime > 0) {
-            val dateFormatter = SimpleDateFormat("dd MMMM, yyyy", Locale.getDefault())
-            val timeFormatter = SimpleDateFormat("h:mma", Locale.getDefault())
-            dateTextView.text = dateFormatter.format(Date(startTime))
-            timeTextView.text = "${timeFormatter.format(Date(startTime))} - ${timeFormatter.format(Date(endTime))}"
-        }
-
-        // Load image
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.placeholder_image)
-                .into(imageView)
-        } else {
-            imageView.setImageResource(R.drawable.placeholder_image)
-        }
-
-        val db = FirebaseFirestore.getInstance()
-
-        db.collection("attendee")
-            .whereEqualTo("eventId", eventId)
-            .get()
-            .addOnSuccessListener { attendeeDocuments ->
-                val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
-
-                if (userIds.isEmpty()) return@addOnSuccessListener
-
-                // Now fetch users' profile pics
-                db.collection("users")
-                    .whereIn(FieldPath.documentId(), userIds.take(10)) // Firestore 'whereIn' limit is 10
-                    .get()
-                    .addOnSuccessListener { userDocuments ->
-                        val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
-                        displayAttendees(profilePics, totalCount = userIds.size)
-                    }
-            }
 
 
         // Button action
@@ -421,9 +394,6 @@ class EventDetailActivity : AppCompatActivity() {
         joinButton.setBackgroundColor(getColor(android.R.color.holo_green_dark))
     }
 
-    fun setButtonToJoin() {
-        joinButton.text = "Join Now"
-        joinButton.setBackgroundColor(Color.parseColor("#333333")) // properly parsed hex color
     private fun setButtonToJoin() {
         joinButton.text = "Join Event"
         joinButton.setBackgroundColor(Color.parseColor("#333333"))

@@ -2,8 +2,6 @@
 <resources>
     <style name="TagButton">
         <item name="android:radius">16dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
         <item name="android:background">@drawable/category_background</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorPrimary">@android:color/white</item>
