@@ -1,12 +1,21 @@
 package cit.edu.wildevents
 
+import android.app.AlarmManager
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +25,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+            }
+        }
+
+        // Load default fragment
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, DiscoverFragment())
+                .commit()
+        }
 
         val discoverButton = findViewById<ImageView>(R.id.nav_discover)
         val profileButton = findViewById<ImageView>(R.id.nav_profile)

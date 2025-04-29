@@ -20,6 +20,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import cit.edu.wildevents.app.MyApplication
 import cit.edu.wildevents.data.Event
 import cit.edu.wildevents.helper.EventsViewModel
@@ -30,6 +33,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
+import androidx.work.OneTimeWorkRequestBuilder
+import cit.edu.wildevents.services.EventReminderWorker
 
 
 class CreateEventActivity : AppCompatActivity() {
@@ -348,6 +354,13 @@ class CreateEventActivity : AppCompatActivity() {
                         }
                 }
 
+                // Schedule reminders for the event
+                scheduleEventReminders(
+                    context = this,
+                    eventTitle = eventNameInput.text.toString(),
+                    eventTimeInMillis =  startTime!!.timeInMillis// Assuming eventDate is a Date object
+                )
+
                 // Add to local ViewModel
                 val viewModel = ViewModelProvider(this@CreateEventActivity)[EventsViewModel::class.java]
                 viewModel.addEvent(event)
@@ -395,6 +408,46 @@ class CreateEventActivity : AppCompatActivity() {
                 // Guide the user to the app settings to enable the permission
                 val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                 startActivity(intent)
+            }
+        }
+    }
+
+    private fun scheduleEventReminders(
+        context: Context,
+        eventTitle: String,
+        eventTimeInMillis: Long
+    ) {
+        val workManager = WorkManager.getInstance(context)
+
+        // --- Helper Function ---
+        fun scheduleReminder(delayMillis: Long, message: String) {
+            val data = Data.Builder()
+                .putString("eventTitle", eventTitle)
+                .putString("message", message)
+                .build()
+
+            val workRequest = OneTimeWorkRequestBuilder<EventReminderWorker>()
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+                .setInputData(data)
+                .build()
+
+            workManager.enqueue(workRequest)
+        }
+
+        val now = System.currentTimeMillis()
+
+        val timeUntilEvent = eventTimeInMillis - now
+
+        if (timeUntilEvent > 0) {
+            if (timeUntilEvent > 7 * 24 * 60 * 60 * 1000) { // More than a week left
+                scheduleReminder(timeUntilEvent - 7 * 24 * 60 * 60 * 1000, "Your event '$eventTitle' is 1 week away!")
+            }
+            if (timeUntilEvent > 24 * 60 * 60 * 1000) { // More than a day left
+                scheduleReminder(timeUntilEvent - 24 * 60 * 60 * 1000, "Reminder: '$eventTitle' is tomorrow!")
+            }
+            if (timeUntilEvent > 60 * 60 * 1000) { // More than an hour left
+                scheduleReminder(timeUntilEvent - 60 * 60 * 1000, "Get ready! '$eventTitle' is starting in 1 hour.")
+                Log.d("Reminders", "Reminder set for 1 hour before the event.")
             }
         }
     }
