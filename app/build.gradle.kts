@@ -72,6 +72,7 @@ dependencies {
     implementation ("com.google.android.material:material:1.4.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation ("com.cloudinary:cloudinary-android:2.3.1")
+    implementation ("androidx.work:work-runtime-ktx:2.9.0")
     implementation ("com.google.firebase:firebase-messaging:24.1.1")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)
