@@ -1,75 +1,86 @@
 package cit.edu.wildevents
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.widget.Button
+import android.widget.CalendarView
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 
 class MainActivity : AppCompatActivity() {
     private var previouslySelectedButton: ImageView? = null
+    private var previousTag: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // Load default fragment
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, DiscoverFragment())
-                .commit()
-        }
 
         val discoverButton = findViewById<ImageView>(R.id.nav_discover)
         val profileButton = findViewById<ImageView>(R.id.nav_profile)
         val wishlistButton = findViewById<ImageView>(R.id.nav_wishlist)
         val messagesButton = findViewById<ImageView>(R.id.nav_messages)
 
+
         // Set default selected button
         previouslySelectedButton = discoverButton
-        discoverButton.setImageResource(R.drawable.icon_selector)
+        previousTag = "home"
+        discoverButton.setImageResource(R.drawable.ic_home_filled)
+        switchFragment(DiscoverFragment())
 
-        // Handle Bottom Navigation Clicks
         discoverButton.setOnClickListener {
             switchFragment(DiscoverFragment())
-            updateSelectedButton(discoverButton, R.drawable.ic_magnifying_glass)
+            updateSelectedButton(discoverButton)
         }
 
         profileButton.setOnClickListener {
             switchFragment(ProfileFragment())
-            updateSelectedButton(profileButton, R.drawable.ic_user)
+            updateSelectedButton(profileButton)
         }
 
         wishlistButton.setOnClickListener {
             switchFragment(YourEventsFragment())
-            updateSelectedButton(wishlistButton, R.drawable.ic_heart)
+            updateSelectedButton(wishlistButton)
         }
 
         messagesButton.setOnClickListener {
             switchFragment(MessagesFragment())
-            updateSelectedButton(messagesButton, R.drawable.ic_message)
+            updateSelectedButton(messagesButton)
         }
     }
 
-    private fun updateSelectedButton(newSelectedButton: ImageView, defaultDrawable: Int) {
-        // Reset the previously selected button to its default drawable
-        previouslySelectedButton?.setImageResource(defaultDrawable)
+    private fun updateSelectedButton(newSelectedButton: ImageView) {
+        // Reset previous to its outline version
+        previousTag?.let {
+            val defaultResId = getDrawableIdForTag(it, filled = false)
+            previouslySelectedButton?.setImageResource(defaultResId)
+        }
 
-        // Apply the icon_selector to the new selected button
-        newSelectedButton.setImageResource(R.drawable.icon_selector)
+        // Set new to its filled version
+        val newTag = newSelectedButton.tag as String
+        val filledResId = getDrawableIdForTag(newTag, filled = true)
+        newSelectedButton.setImageResource(filledResId)
 
-        // Update the reference to the currently selected button
+        // Update state
         previouslySelectedButton = newSelectedButton
+        previousTag = newTag
+    }
+
+    private fun getDrawableIdForTag(tag: String, filled: Boolean): Int {
+        val resourceName = if (filled) "ic_${tag}_filled" else "ic_${tag}_hollow"
+        return resources.getIdentifier(resourceName, "drawable", packageName)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 
     private fun switchFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null) // Add this line to retain fragment state
+            .addToBackStack(null)
             .commit()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish() // Closes all activities and exits the app
     }
 }

@@ -5,60 +5,162 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFFF">
+    android:background="#ECECEC">
 
     <!-- Header -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        app:title="Create Event"
-        android:textAlignment="center"
-        app:titleTextColor="@color/black"
-        app:popupTheme="@style/Theme.WildEvents"
-        android:elevation="8dp"/>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="55dp"
+        android:background="@color/white"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:elevation="8dp">
 
-
-
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/eventToggleGroup"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:singleSelection="true"
-            android:layout_marginBottom="12dp"
-            app:checkedButton="@+id/upcomingBtn">
+            android:textSize="20dp"
+            android:text="Events"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/upcomingBtn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Upcoming"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/pastBtn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Past Events"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-
-        <!-- RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/eventsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_down"
+            android:layout_marginLeft="10dp"
+            android:clickable="true"
+            android:id="@+id/btnCalendar"/>
 
     </LinearLayout>
+
+
+
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/eventFilterDropdown"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_image"
+                    android:gravity="center_vertical"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:elevation="8dp"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/eventFilterText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Upcoming"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/eventFilterIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_down"
+                        android:contentDescription="Dropdown Icon" />
+                </LinearLayout>
+
+                <!-- Ownership Filter Dropdown -->
+                <LinearLayout
+                    android:id="@+id/ownershipFilterDropdown"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_image"
+                    android:gravity="center_vertical|end"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:elevation="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_gravity="center_vertical|end">
+
+                    <TextView
+                        android:id="@+id/ownershipFilterText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Going"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/ownershipFilterIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_down"
+                        android:contentDescription="Dropdown Icon" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/showCalendar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:gravity="center"
+                >
+
+                <CalendarView
+                    android:id="@+id/calendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_image"
+                    android:elevation="8dp"
+                    android:clipToOutline="true"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="20dp"
+                    />
+
+            </LinearLayout>
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/eventsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:nestedScrollingEnabled="false"
+                android:padding="4dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

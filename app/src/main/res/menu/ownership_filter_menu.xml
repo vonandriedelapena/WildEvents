@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_all"
+        android:title="All" />
+    <item
+        android:id="@+id/menu_joined"
+        android:title="Joined" />
+    <item
+        android:id="@+id/menu_hosted"
+        android:title="Hosted" />
+    <item
+        android:id="@+id/menu_not_attended"
+        android:title="Not Attended" />
+</menu>

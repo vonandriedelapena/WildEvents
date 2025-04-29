@@ -16,13 +16,17 @@ class EventsViewModel : ViewModel() {
     val events: LiveData<List<Event>> get() = _filteredEvents
 
     private var listenerRegistration: ListenerRegistration? = null
+    private var attendeeListener: ListenerRegistration? = null
 
     private var timeFilterMode: TimeFilterMode = TimeFilterMode.UPCOMING
     private var currentQuery: String = ""
     private var currentCategory: String? = null
 
+    private val eventAttendees = mutableMapOf<String, MutableList<String>>()
+
     init {
-        startListeningToEvents() // 👈 Move it here
+        startListeningToEvents()
+        startListeningToAttendees()
     }
 
     fun setTimeFilterMode(mode: TimeFilterMode) {
@@ -66,6 +70,36 @@ class EventsViewModel : ViewModel() {
             }
     }
 
+    private fun startListeningToAttendees() {
+        attendeeListener = FirebaseFirestore.getInstance()
+            .collection("attendee")
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot != null) {
+                    val updatedMap = mutableMapOf<String, MutableList<String>>()
+                    for (doc in snapshot.documents) {
+                        val eventId = doc.getString("eventId") ?: continue
+                        val userId = doc.getString("userId") ?: continue
+                        updatedMap.getOrPut(eventId) { mutableListOf() }.add(userId)
+                    }
+                    synchronized(eventAttendees) {
+                        eventAttendees.clear()
+                        eventAttendees.putAll(updatedMap)
+                    }
+                }
+            }
+    }
+
+    fun getAttendeesForEvent(eventId: String): List<String> {
+        return synchronized(eventAttendees) {
+            eventAttendees[eventId]?.toList() ?: emptyList()
+        }
+    }
+
+    fun getEventsJoinedByUser(userId: String): List<String> {
+        return synchronized(eventAttendees) {
+            eventAttendees.filterValues { it.contains(userId) }.keys.toList()
+        }
+    }
 
     fun filterEvents(query: String, category: String? = null) {
         val currentTime = System.currentTimeMillis()
@@ -91,8 +125,6 @@ class EventsViewModel : ViewModel() {
                 TimeFilterMode.ALL -> true
             }
 
-            Log.d("EventFilterCheck", "Event=${event.eventName}, tags=${event.tags}, matchesCategory=$matchesCategory, matchesQuery=$matchesQuery, matchesTime=$matchesTime")
-
             matchesQuery && matchesCategory && matchesTime
         }
 
@@ -108,5 +140,6 @@ class EventsViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         listenerRegistration?.remove()
+        attendeeListener?.remove()
     }
 }

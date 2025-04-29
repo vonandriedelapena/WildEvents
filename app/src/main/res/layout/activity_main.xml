@@ -32,7 +32,7 @@
 
             <LinearLayout
                 android:id="@+id/nav_discover_layout"
-                android:layout_width="30dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
@@ -41,29 +41,20 @@
 
                 <ImageView
                     android:id="@+id/nav_discover"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_magnifying_glass"
-                    android:contentDescription="Discover"
-                    app:tint="@drawable/icon_selector"
-                    android:clickable="true"
-                    android:focusable="true"/>
-
-                <TextView
-                    android:id="@+id/discover_label"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Discover"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_selector"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_home_hollow"
+                    android:contentDescription="Discover"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:tag="home"/>
+
             </LinearLayout>
 
 
             <LinearLayout
                 android:id="@+id/wishList_layout"
-                android:layout_width="30dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
@@ -71,35 +62,19 @@
 
                 <ImageView
                     android:id="@+id/nav_wishlist"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ic_heart"
-                    android:contentDescription="Wishlist"/>
-
-                <TextView
-                    android:id="@+id/wishlist_label"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Wishlist"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/black"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_height="30dp"
+                    android:tag="calendar"
+                    android:src="@drawable/ic_calendar_hollow"
+                    android:contentDescription="Wishlist"
+                    android:clickable="true"/>
+
             </LinearLayout>
-
-
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/logo"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="true"/>
 
 
             <LinearLayout
                 android:id="@+id/messages_layout"
-                android:layout_width="30dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
@@ -109,28 +84,21 @@
                     android:id="@+id/nav_messages"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_message"
+                    android:src="@drawable/ic_bell_ring_hollow"
                     android:clickable="true"
                     android:focusable="true"
                     android:contentDescription="Messages"
-                    app:tint="@color/black"/>
+                    app:tint="@color/black"
+                    android:tag="bell_ring"/>
 
-                <TextView
-                    android:id="@+id/messages_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Messages"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/black"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp"/>
+
             </LinearLayout>
 
 
 
             <LinearLayout
                 android:id="@+id/nav_profile_layout"
-                android:layout_width="30dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center"
@@ -139,23 +107,15 @@
 
                 <ImageView
                     android:id="@+id/nav_profile"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_user"
+                    android:src="@drawable/ic_user_hollow"
                     app:tint="@color/black"
                     android:contentDescription="Profile"
                     android:clickable="true"
+                    android:tag="user"
                     android:focusable="true"/>
 
-                <TextView
-                    android:id="@+id/profile_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Profile"
-                    android:textSize="12sp"
-                    android:textColor="@android:color/black"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp"/>
             </LinearLayout>
 
         </LinearLayout>

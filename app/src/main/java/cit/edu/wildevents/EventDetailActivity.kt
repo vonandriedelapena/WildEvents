@@ -166,7 +166,7 @@ class EventDetailActivity : AppCompatActivity() {
                     .get()
                     .addOnSuccessListener { userDocuments ->
                         val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
-                        displayAttendees(profilePics, totalCount = userIds.size)
+                        //displayAttendees(profilePics, totalCount = userIds.size)
                     }
             }
 

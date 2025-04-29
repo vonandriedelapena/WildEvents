@@ -9,7 +9,7 @@ title, date, and description -->
     android:orientation="vertical"
     android:background="@drawable/rounded_image"
     android:padding="16dp"
-    android:layout_marginBottom="18dp">
+    android:layout_marginBottom="24dp">
 
     <ImageView
         android:id="@+id/event_image"
