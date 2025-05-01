@@ -5,18 +5,55 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import cit.edu.wildevents.data.Comment
 import com.bumptech.glide.Glide
 
-class CommentAdapter(private var comments: MutableList<Comment>) :
-    RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
+class CommentAdapter(
+    private var comments: MutableList<Comment>,
+    private val currentUserId: String,
+    private val currentEventId: String,
+    private val isHost: Boolean,
+    private val onDeleteComment: (Comment) -> Unit
+) : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
 
-    class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val userAvatar: ImageView = view.findViewById(R.id.user_avatar)
         val userName: TextView = view.findViewById(R.id.user_name)
         val commentContent: TextView = view.findViewById(R.id.comment_content)
         val commentTimestamp: TextView = view.findViewById(R.id.comment_timestamp)
+
+        fun bind(comment: Comment) {
+            userName.text = comment.userName
+            commentContent.text = comment.content
+            commentTimestamp.text = android.text.format.DateFormat.format("dd MMM yyyy, hh:mm a", comment.timestamp).toString()
+
+            if (!comment.userAvatarUrl.isNullOrEmpty()) {
+                Glide.with(userAvatar.context)
+                    .load(comment.userAvatarUrl)
+                    .circleCrop()
+                    .into(userAvatar)
+            } else {
+                userAvatar.setImageResource(R.drawable.ic_user)
+            }
+
+            // Handle long press for deletion
+            itemView.setOnLongClickListener {
+                val canDelete = (comment.userId == currentUserId || isHost) && comment.eventId == currentEventId
+                if (canDelete) {
+                    AlertDialog.Builder(itemView.context)
+                        .setTitle("Delete Comment")
+                        .setMessage("Are you sure you want to delete this comment?")
+                        .setPositiveButton("Delete") { _, _ ->
+                            onDeleteComment(comment)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+                true
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
@@ -26,21 +63,7 @@ class CommentAdapter(private var comments: MutableList<Comment>) :
     }
 
     override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
-        val comment = comments[position]
-        holder.userName.text = comment.userName
-        holder.commentContent.text = comment.content
-        holder.commentTimestamp.text = comment.timestamp?.let {
-            android.text.format.DateFormat.format("dd MMM yyyy, hh:mm a", it).toString()
-        } ?: "Just now"
-
-        if (!comment.userAvatarUrl.isNullOrEmpty()) {
-            Glide.with(holder.userAvatar.context)
-                .load(comment.userAvatarUrl)
-                .circleCrop()
-                .into(holder.userAvatar)
-        } else {
-            holder.userAvatar.setImageResource(R.drawable.ic_user) // fallback avatar
-        }
+        holder.bind(comments[position])
     }
 
     override fun getItemCount(): Int = comments.size
@@ -51,3 +74,4 @@ class CommentAdapter(private var comments: MutableList<Comment>) :
         notifyDataSetChanged()
     }
 }
+
