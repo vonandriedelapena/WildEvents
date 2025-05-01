@@ -142,4 +142,12 @@ class EventsViewModel : ViewModel() {
         listenerRegistration?.remove()
         attendeeListener?.remove()
     }
+
+    fun getAllEvents(): List<Event> {
+        return _allEvents.value ?: emptyList()
+    }
+
+    fun getTimeFilterMode(): TimeFilterMode {
+        return timeFilterMode
+    }
 }

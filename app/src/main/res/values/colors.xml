@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#800000</color>
+    <color name="primary">#89333b</color>
     <color name="primaryVariant">#DDA768</color>
     <color name="onPrimary">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="gold">#D4AF37</color>
-    <color name="maroon">#800000</color>
+    <color name="maroon">#89333b</color>
     <color name="cream">#F5F5DC</color>
 </resources>

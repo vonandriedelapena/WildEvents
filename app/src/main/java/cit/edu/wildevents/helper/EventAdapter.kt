@@ -87,8 +87,7 @@ class EventAdapter(private val context: Context) :
         if (currentUser != null) {
             if (currentUser.isHost && currentUser.id == event.hostId) {
                 // Host user, show Edit Event
-                holder.joinButton.text = "Edit Event"
-                holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
+                setButtonToEdit(holder)
                 holder.joinButton.setOnClickListener {
                     val intent = Intent(context, cit.edu.wildevents.EditEventActivity::class.java)
                     intent.putExtra("eventId", event.eventId)
@@ -241,7 +240,7 @@ class EventAdapter(private val context: Context) :
 
     private fun setButtonToEdit(holder: EventViewHolder) {
         holder.joinButton.text = "Edit Event"
-        holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
+        holder.joinButton.setBackgroundColor(Color.parseColor("#D4AF37"))
     }
 
 }

@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/yourEventsFragment"
-    android:fitsSystemWindows="true"
+    android:id="@+id/yourEventsRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#ECECEC">
 
-    <!-- Header -->
+    <!-- Fixed Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:background="@color/white"
-        android:layout_gravity="center"
         android:gravity="center"
         android:elevation="8dp">
 
@@ -21,27 +19,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24dp"
-            android:text="Events"
+            android:text="Calendar"
             android:textStyle="bold"
-            android:textColor="@color/black"
-            />
+            android:textColor="@color/black" />
 
         <ImageView
-            android:layout_marginTop="3dp"
+            android:id="@+id/btnCalendar"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_down"
             android:layout_marginLeft="10dp"
-            android:clickable="true"
-            android:id="@+id/btnCalendar"/>
-
+            android:layout_marginTop="3dp"
+            android:src="@drawable/ic_down"
+            android:clickable="true" />
     </LinearLayout>
 
-
-
-    <ScrollView
+    <!-- Scrollable Content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/yourEventsScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,25 +47,25 @@
             android:orientation="vertical"
             android:padding="14dp">
 
+            <!-- Filter Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+                <!-- Time Filter -->
                 <LinearLayout
                     android:id="@+id/eventFilterDropdown"
-                    android:layout_width="140dp"
+                    android:layout_width="130dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="12dp"
                     android:background="@drawable/rounded_image"
                     android:gravity="center_vertical"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:elevation="8dp"
-                    android:layout_marginBottom="10dp">
+                    android:layout_margin="10dp">
 
                     <TextView
                         android:id="@+id/eventFilterText"
@@ -77,41 +75,39 @@
                         android:text="Upcoming"
                         android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"/>
 
                     <ImageView
                         android:id="@+id/eventFilterIcon"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_down"
-                        android:contentDescription="Dropdown Icon" />
+                        android:src="@drawable/ic_down" />
                 </LinearLayout>
 
-                <!-- Ownership Filter Dropdown -->
+                <!-- Ownership Filter -->
                 <LinearLayout
                     android:id="@+id/ownershipFilterDropdown"
-                    android:layout_width="150dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="horizontal"
                     android:padding="12dp"
                     android:background="@drawable/rounded_image"
-                    android:gravity="center_vertical|end"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginStart="30dp"
-                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
                     android:clickable="true"
                     android:focusable="true"
                     android:elevation="8dp"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_gravity="center_vertical|end">
+                    android:layout_marginRight="10dp">
 
                     <TextView
                         android:id="@+id/ownershipFilterText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Going"
+                        android:text="Joined"
                         android:textStyle="bold"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
@@ -120,20 +116,18 @@
                         android:id="@+id/ownershipFilterIcon"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_down"
-                        android:contentDescription="Dropdown Icon" />
+                        android:src="@drawable/ic_down" />
                 </LinearLayout>
-
             </LinearLayout>
 
+            <!-- Calendar -->
             <LinearLayout
                 android:id="@+id/showCalendar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:visibility="gone"
-                android:gravity="center"
-                >
+                android:gravity="center">
 
                 <CalendarView
                     android:id="@+id/calendarView"
@@ -142,25 +136,18 @@
                     android:background="@drawable/rounded_image"
                     android:elevation="8dp"
                     android:clipToOutline="true"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:layout_marginBottom="16dp"
-                    />
-
+                    android:layout_marginTop="16dp"/>
             </LinearLayout>
 
-            <!-- RecyclerView -->
+            <!-- Event List -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/eventsRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:padding="2dp"/>
-
         </LinearLayout>
-
-    </ScrollView>
-
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

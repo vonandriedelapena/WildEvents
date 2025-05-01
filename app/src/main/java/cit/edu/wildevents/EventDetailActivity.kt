@@ -414,7 +414,7 @@ class EventDetailActivity : AppCompatActivity() {
 
     private fun setButtonToGoing() {
         joinButton.text = "Going"
-        joinButton.setBackgroundColor(getColor(android.R.color.holo_green_dark))
+        joinButton.setBackgroundColor(Color.parseColor("#388E3C"))
     }
 
     private fun setButtonToJoin() {
@@ -424,7 +424,7 @@ class EventDetailActivity : AppCompatActivity() {
 
     private fun setButtonToEdit() {
         joinButton.text = "Edit Event"
-        joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
+        joinButton.setBackgroundColor(Color.parseColor("#D4AF37"))
     }
 
     override fun onSupportNavigateUp(): Boolean {

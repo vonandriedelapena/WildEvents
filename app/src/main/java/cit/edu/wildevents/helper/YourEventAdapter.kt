@@ -8,11 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
@@ -26,8 +22,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
-class YourEventAdapter(private val context: Context) :
-    RecyclerView.Adapter<YourEventAdapter.YourEventViewHolder>() {
+class YourEventAdapter(
+    private val context: Context,
+    private val onEventDeleted: (() -> Unit)? = null
+) : RecyclerView.Adapter<YourEventAdapter.YourEventViewHolder>() {
 
     private var events: List<Event> = emptyList()
 
@@ -68,20 +66,13 @@ class YourEventAdapter(private val context: Context) :
             val isHostOfThisEvent = currentUser.isHost && currentUser.id == event.hostId
 
             if (isHostOfThisEvent) {
-                // Host of this event
                 setButtonToEdit(holder)
-
                 holder.joinButton.setOnClickListener {
                     val intent = Intent(context, cit.edu.wildevents.EditEventActivity::class.java)
                     intent.putExtra("eventId", event.eventId)
                     context.startActivity(intent)
                 }
-
-                // 👉 DO NOT fetch or show attendees for their own event
             } else {
-                // Normal user or host viewing other events
-
-                // Check RSVP status
                 db.collection("attendee")
                     .whereEqualTo("eventId", event.eventId)
                     .whereEqualTo("userId", currentUser.id)
@@ -90,14 +81,12 @@ class YourEventAdapter(private val context: Context) :
                         if (!documents.isEmpty) {
                             val attendeeDocId = documents.documents[0].id
                             setButtonToGoing(holder)
-
                             holder.joinButton.setOnClickListener {
                                 AlertDialog.Builder(context)
                                     .setTitle("Cancel RSVP")
                                     .setMessage("Should I cancel your RSVP?")
                                     .setPositiveButton("Yes") { _, _ ->
-                                        db.collection("attendee")
-                                            .document(attendeeDocId)
+                                        db.collection("attendee").document(attendeeDocId)
                                             .delete()
                                             .addOnSuccessListener {
                                                 setButtonToJoin(holder)
@@ -112,7 +101,6 @@ class YourEventAdapter(private val context: Context) :
                             }
                         } else {
                             setButtonToJoin(holder)
-
                             holder.joinButton.setOnClickListener {
                                 val attendeeData = mapOf(
                                     "eventId" to event.eventId,
@@ -131,26 +119,24 @@ class YourEventAdapter(private val context: Context) :
                         }
                     }
 
-                // 👉 Fetch attendees normally (only if not the host of this event)
                 db.collection("attendee")
                     .whereEqualTo("eventId", event.eventId)
                     .get()
-                    .addOnSuccessListener { attendeeDocuments ->
-                        val userIds = attendeeDocuments.mapNotNull { it.getString("userId") }
+                    .addOnSuccessListener { attendeeDocs ->
+                        val userIds = attendeeDocs.mapNotNull { it.getString("userId") }
                         if (userIds.isEmpty()) return@addOnSuccessListener
 
                         db.collection("users")
                             .whereIn(FieldPath.documentId(), userIds.take(10))
                             .get()
-                            .addOnSuccessListener { userDocuments ->
-                                val profilePics = userDocuments.mapNotNull { it.getString("profilePic") }
+                            .addOnSuccessListener { userDocs ->
+                                val profilePics = userDocs.mapNotNull { it.getString("profilePic") }
                                 displayAttendees(holder.attendeesLayout, profilePics, totalCount = userIds.size)
                             }
                     }
             }
         }
 
-        // Open Event Detail when clicking card
         holder.itemView.setOnClickListener {
             val intent = Intent(context, EventDetailActivity::class.java).apply {
                 putExtra("eventId", event.eventId)
@@ -166,13 +152,35 @@ class YourEventAdapter(private val context: Context) :
             }
             context.startActivity(intent)
         }
+
+        // Long press to delete if host
+        holder.itemView.setOnLongClickListener {
+            if (currentUser != null && currentUser.isHost && currentUser.id == event.hostId) {
+                AlertDialog.Builder(context)
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete this event?")
+                    .setPositiveButton("Delete") { _, _ ->
+                        deleteEvent(event.eventId)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+                true
+            } else {
+                false
+            }
+        }
     }
 
+    override fun getItemCount(): Int = events.size
 
+    fun updateEvents(newEvents: List<Event>) {
+        events = newEvents
+        notifyDataSetChanged()
+    }
 
     private fun setButtonToGoing(holder: YourEventViewHolder) {
         holder.joinButton.text = "Going"
-        holder.joinButton.setBackgroundColor(ContextCompat.getColor(context, android.R.color.holo_green_dark))
+        holder.joinButton.setBackgroundColor(Color.parseColor("#388E3C"))
     }
 
     private fun setButtonToJoin(holder: YourEventViewHolder) {
@@ -182,20 +190,35 @@ class YourEventAdapter(private val context: Context) :
 
     private fun setButtonToEdit(holder: YourEventViewHolder) {
         holder.joinButton.text = "Edit Event"
-        holder.joinButton.setBackgroundColor(Color.parseColor("#FFA500"))
-    }
-
-
-    override fun getItemCount(): Int = events.size
-
-    fun updateEvents(newEvents: List<Event>) {
-        events = newEvents
-        notifyDataSetChanged()
+        holder.joinButton.setBackgroundColor(Color.parseColor("#D4AF37"))
     }
 
     private fun formatDateTime(timeInMillis: Long): String {
         val sdf = SimpleDateFormat("d MMM - EEE - h:mm a", Locale.getDefault())
         return sdf.format(Date(timeInMillis))
+    }
+
+    private fun deleteEvent(eventId: String) {
+        val db = FirebaseFirestore.getInstance()
+        val eventRef = db.collection("events").document(eventId)
+
+        db.collection("attendee")
+            .whereEqualTo("eventId", eventId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { doc -> batch.delete(doc.reference) }
+                batch.delete(eventRef)
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Event deleted successfully", Toast.LENGTH_SHORT).show()
+                        onEventDeleted?.invoke()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show()
+                    }
+            }
     }
 
     private fun displayAttendees(
@@ -215,9 +238,7 @@ class YourEventAdapter(private val context: Context) :
             if (index < maxVisiblePfps) {
                 val imageView = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
-                        if (index != 0) {
-                            marginStart = overlapMargin
-                        }
+                        if (index != 0) marginStart = overlapMargin
                         setPadding(4)
                     }
                     scaleType = ImageView.ScaleType.CENTER_CROP
@@ -235,7 +256,6 @@ class YourEventAdapter(private val context: Context) :
             }
         }
 
-        // Corrected Condition
         if (actualCount > maxVisiblePfps) {
             val remainingCount = totalCount - maxVisiblePfps
             if (remainingCount > 0) {
@@ -245,7 +265,7 @@ class YourEventAdapter(private val context: Context) :
                     }
                     text = "+$remainingCount"
                     gravity = Gravity.CENTER
-                    background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border) // better visibility
+                    background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border)
                     setTextColor(Color.WHITE)
                     textSize = 14f
                     setTypeface(null, Typeface.BOLD)

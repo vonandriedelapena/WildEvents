@@ -112,7 +112,7 @@ class DiscoverFragment : Fragment() {
                 // Highlight selected button
                 button.setBackgroundResource(R.drawable.category_background)
                 button.backgroundTintList = ColorStateList.valueOf(selectedColor)
-                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.maroon))
+                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
             }
         }
 

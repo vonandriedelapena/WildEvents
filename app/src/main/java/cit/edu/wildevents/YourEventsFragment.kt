@@ -12,7 +12,6 @@ import cit.edu.wildevents.data.Event
 import cit.edu.wildevents.data.TimeFilterMode
 import cit.edu.wildevents.helper.YourEventAdapter
 import cit.edu.wildevents.helper.EventsViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,7 +58,11 @@ class YourEventsFragment : Fragment() {
         ownershipFilterIcon = view.findViewById(R.id.ownershipFilterIcon)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = YourEventAdapter(requireContext())
+
+        // ✅ Pass refresh callback to adapter for deletion support
+        adapter = YourEventAdapter(requireContext()) {
+            viewModel.filterEvents("", null)
+        }
         recyclerView.adapter = adapter
 
         viewModel = ViewModelProvider(requireActivity())[EventsViewModel::class.java]
@@ -68,13 +71,8 @@ class YourEventsFragment : Fragment() {
         calendarBtn.setOnClickListener {
             val isVisible = calendarLayout.visibility == View.VISIBLE
             calendarLayout.visibility = if (isVisible) View.GONE else View.VISIBLE
-
-            if (!isVisible) {
-                calendarBtn.scaleY = -1f  // Flip when showing
-            } else {
-                calendarBtn.scaleY = 1f   // Reset when hiding
-                applyCombinedFilter()
-            }
+            calendarBtn.scaleY = if (!isVisible) -1f else 1f
+            if (isVisible) applyCombinedFilter()
         }
 
         eventFilterLayout.setOnClickListener {
@@ -86,20 +84,18 @@ class YourEventsFragment : Fragment() {
                     R.id.menu_all -> {
                         viewModel.setTimeFilterMode(TimeFilterMode.ALL)
                         eventFilterText.text = "All"
-                        true
                     }
                     R.id.menu_upcoming -> {
                         viewModel.setTimeFilterMode(TimeFilterMode.UPCOMING)
                         eventFilterText.text = "Upcoming"
-                        true
                     }
                     R.id.menu_past -> {
                         viewModel.setTimeFilterMode(TimeFilterMode.PAST)
                         eventFilterText.text = "Past"
-                        true
                     }
-                    else -> false
                 }
+                viewModel.filterEvents("", null)
+                true
             }
             popup.show()
         }
@@ -122,6 +118,8 @@ class YourEventsFragment : Fragment() {
                 }
 
                 ownershipFilterText.text = selectedOwnership
+                calendarLayout.visibility = View.GONE
+                calendarBtn.scaleY = 1f
                 applyCombinedFilter()
                 true
             }
@@ -129,15 +127,19 @@ class YourEventsFragment : Fragment() {
             popup.show()
         }
 
-
         viewModel.events.observe(viewLifecycleOwner) { filteredEvents ->
             val currentUser = (requireContext().applicationContext as MyApplication).currentUser
             if (currentUser != null) {
                 val goingEventIds = viewModel.getEventsJoinedByUser(currentUser.id)
                 isUserHost = filteredEvents.any { it.hostId == currentUser.id }
 
-                fullEventList = filteredEvents
-                allFilteredEvents = filteredEvents // <-- Include all events here
+                allFilteredEvents = if (viewModel.getTimeFilterMode() == TimeFilterMode.ALL) {
+                    viewModel.getAllEvents()
+                } else {
+                    filteredEvents
+                }
+
+                fullEventList = viewModel.getAllEvents()
                 applyCombinedFilter()
             } else {
                 adapter.updateEvents(emptyList())
@@ -161,16 +163,28 @@ class YourEventsFragment : Fragment() {
 
     private fun applyCombinedFilter() {
         val currentUser = (requireContext().applicationContext as MyApplication).currentUser
-        val filtered = allFilteredEvents.filter { event ->
+        if (currentUser == null) {
+            adapter.updateEvents(emptyList())
+            return
+        }
+
+        val baseList = if (viewModel.getTimeFilterMode() == TimeFilterMode.ALL) {
+            viewModel.getAllEvents()
+        } else {
+            allFilteredEvents
+        }
+
+        val filtered = baseList.filter { event ->
             when (selectedOwnership) {
-                "Joined" -> event.hostId != currentUser?.id &&
-                        viewModel.getAttendeesForEvent(event.eventId).contains(currentUser?.id)
-                "Hosted" -> event.hostId == currentUser?.id
-                "Not Attended" -> event.hostId != currentUser?.id &&
-                        !viewModel.getAttendeesForEvent(event.eventId).contains(currentUser?.id)
+                "Joined" -> event.hostId != currentUser.id &&
+                        viewModel.getAttendeesForEvent(event.eventId).contains(currentUser.id)
+                "Hosted" -> event.hostId == currentUser.id
+                "Not Attended" -> event.hostId != currentUser.id &&
+                        !viewModel.getAttendeesForEvent(event.eventId).contains(currentUser.id)
                 else -> true
             }
         }
+
         adapter.updateEvents(filtered)
     }
 }
