@@ -15,7 +15,8 @@ class CommentAdapter(
     private val currentUserId: String,
     private val currentEventId: String,
     private val isHost: Boolean,
-    private val onDeleteComment: (Comment) -> Unit
+    private val onDeleteComment: (Comment) -> Unit,
+    private val onEditComment: (Comment) -> Unit
 ) : RecyclerView.Adapter<CommentAdapter.CommentViewHolder>() {
 
     inner class CommentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -38,17 +39,26 @@ class CommentAdapter(
                 userAvatar.setImageResource(R.drawable.ic_user)
             }
 
-            // Handle long press for deletion
             itemView.setOnLongClickListener {
-                val canDelete = (comment.userId == currentUserId || isHost) && comment.eventId == currentEventId
-                if (canDelete) {
+                val canModify = (comment.userId == currentUserId || isHost) && comment.eventId == currentEventId
+                if (canModify) {
                     AlertDialog.Builder(itemView.context)
-                        .setTitle("Delete Comment")
-                        .setMessage("Are you sure you want to delete this comment?")
-                        .setPositiveButton("Delete") { _, _ ->
-                            onDeleteComment(comment)
+                        .setTitle("Manage Comment")
+                        .setItems(arrayOf("Edit", "Delete")) { _, which ->
+                            when (which) {
+                                0 -> onEditComment(comment) // Edit
+                                1 -> {
+                                    AlertDialog.Builder(itemView.context)
+                                        .setTitle("Delete Comment")
+                                        .setMessage("Are you sure you want to delete this comment?")
+                                        .setPositiveButton("Delete") { _, _ ->
+                                            onDeleteComment(comment)
+                                        }
+                                        .setNegativeButton("Cancel", null)
+                                        .show()
+                                }
+                            }
                         }
-                        .setNegativeButton("Cancel", null)
                         .show()
                 }
                 true
@@ -74,4 +84,5 @@ class CommentAdapter(
         notifyDataSetChanged()
     }
 }
+
 

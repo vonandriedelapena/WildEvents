@@ -358,13 +358,13 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     private fun setupCommentsSection() {
-        val isHost = currentUser?.isHost // replace `eventHostId` with your event's actual host ID
+        val isHost = currentUser?.isHost ?: false
 
         commentAdapter = CommentAdapter(
             comments = mutableListOf(),
             currentUserId = currentUser!!.id,
             currentEventId = eventId!!,
-            isHost = isHost!!,
+            isHost = isHost,
             onDeleteComment = { comment ->
                 FirebaseFirestore.getInstance()
                     .collection("comments")
@@ -372,11 +372,14 @@ class EventDetailActivity : AppCompatActivity() {
                     .delete()
                     .addOnSuccessListener {
                         Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show()
-                        loadCommentsForEvent(eventId)
+                        loadCommentsForEvent(eventId!!)
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Failed to delete comment: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
+            },
+            onEditComment = { comment ->
+                showEditCommentDialog(comment)
             }
         )
 
@@ -391,7 +394,33 @@ class EventDetailActivity : AppCompatActivity() {
             }
         }
     }
+    private fun showEditCommentDialog(comment: Comment) {
+        val editText = EditText(this)
+        editText.setText(comment.content)
+        editText.setSelection(comment.content.length)
 
+        AlertDialog.Builder(this)
+            .setTitle("Edit Comment")
+            .setView(editText)
+            .setPositiveButton("Save") { _, _ ->
+                val updatedContent = editText.text.toString().trim()
+                if (updatedContent.isNotEmpty()) {
+                    FirebaseFirestore.getInstance()
+                        .collection("comments")
+                        .document(comment.id)
+                        .update("content", updatedContent)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Comment updated", Toast.LENGTH_SHORT).show()
+                            loadCommentsForEvent(comment.eventId)
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Failed to update comment: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
     private fun postComment(content: String) {
         if (currentUser != null && eventId != null) {
@@ -581,7 +610,7 @@ class EventDetailActivity : AppCompatActivity() {
         val delay = triggerAtMillis - System.currentTimeMillis()
 
         val data = Data.Builder()
-            .putString("eventTitle", "Your Event")
+            .putString("eventTitle", titleTextView.text.toString())
             .putString("message", message)
             .build()
 
