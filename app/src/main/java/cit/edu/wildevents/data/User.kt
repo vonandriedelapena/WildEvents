@@ -13,6 +13,6 @@ data class User(
     var phoneNumber: String,
     var emergencyContact: String,
     var address: String,
-    val profilePic: String = "default.png",
+    var profilePic: String = "default.png",
     val isFirstTime: Boolean = true
 ) : Serializable

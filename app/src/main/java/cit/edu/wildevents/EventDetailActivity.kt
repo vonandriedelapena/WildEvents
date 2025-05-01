@@ -1,6 +1,7 @@
 package cit.edu.wildevents
 
 import android.app.Activity
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -72,6 +73,12 @@ class EventDetailActivity : AppCompatActivity() {
 
         loadEventDetails()
         setupCommentsSection()
+
+        val notificationBtn = findViewById<ImageButton>(R.id.notificationBtn)
+        notificationBtn.setOnClickListener {
+            showReminderPicker() // Function to let user pick when to be reminded
+        }
+
     }
 
     private fun initViews() {
@@ -346,7 +353,28 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     private fun setupCommentsSection() {
-        commentAdapter = CommentAdapter(mutableListOf())
+        val isHost = currentUser?.isHost // replace `eventHostId` with your event's actual host ID
+
+        commentAdapter = CommentAdapter(
+            comments = mutableListOf(),
+            currentUserId = currentUser!!.id,
+            currentEventId = eventId!!,
+            isHost = isHost!!,
+            onDeleteComment = { comment ->
+                FirebaseFirestore.getInstance()
+                    .collection("comments")
+                    .document(comment.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Comment deleted", Toast.LENGTH_SHORT).show()
+                        loadCommentsForEvent(eventId)
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Failed to delete comment: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        )
+
         commentsRecyclerView.adapter = commentAdapter
         commentsRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -358,6 +386,7 @@ class EventDetailActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun postComment(content: String) {
         if (currentUser != null && eventId != null) {
@@ -393,9 +422,13 @@ class EventDetailActivity : AppCompatActivity() {
             .addOnSuccessListener { result ->
                 val comments = result.mapNotNull { doc ->
                     val timestamp = doc.getTimestamp("timestamp")?.toDate()?.time
-                    if (timestamp != null) {
+                    val userId = doc.getString("userId")
+                    val eventIdDoc = doc.getString("eventId")
+                    if (timestamp != null && userId != null && eventIdDoc != null) {
                         Comment(
                             id = doc.id,
+                            userId = userId,
+                            eventId = eventIdDoc,
                             userName = doc.getString("userName") ?: "Unknown",
                             userAvatarUrl = doc.getString("userAvatarUrl"),
                             content = doc.getString("content") ?: "",
@@ -411,6 +444,7 @@ class EventDetailActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error loading comments: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun setButtonToGoing() {
         joinButton.text = "Going"
@@ -513,16 +547,47 @@ class EventDetailActivity : AppCompatActivity() {
         val timeUntilEvent = eventTimeInMillis - now
 
         if (timeUntilEvent > 0) {
-            if (timeUntilEvent > 7 * 24 * 60 * 60 * 1000) { // More than a week left
-                scheduleReminder(timeUntilEvent - 7 * 24 * 60 * 60 * 1000, "Your event '$eventTitle' is 1 week away!")
-            }
-            if (timeUntilEvent > 24 * 60 * 60 * 1000) { // More than a day left
-                scheduleReminder(timeUntilEvent - 24 * 60 * 60 * 1000, "Reminder: '$eventTitle' is tomorrow!")
-            }
             if (timeUntilEvent > 60 * 60 * 1000) { // More than an hour left
                 scheduleReminder(timeUntilEvent - 60 * 60 * 1000, "Get ready! '$eventTitle' is starting in 1 hour.")
                 Log.d("Reminders", "Reminder set for 1 hour before the event.")
             }
         }
+    }
+    private fun showReminderPicker() {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        TimePickerDialog(this, { _, selectedHour, selectedMinute ->
+            // Set selected time today
+            calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
+            calendar.set(Calendar.MINUTE, selectedMinute)
+            calendar.set(Calendar.SECOND, 0)
+
+            val selectedTimeInMillis = calendar.timeInMillis
+            if (selectedTimeInMillis > System.currentTimeMillis()) {
+                scheduleCustomReminder("Don't miss this event!", selectedTimeInMillis)
+            } else {
+                Toast.makeText(this, "Selected time is in the past", Toast.LENGTH_SHORT).show()
+            }
+        }, hour, minute, false).show()
+    }
+    private fun scheduleCustomReminder(message: String, triggerAtMillis: Long) {
+        val delay = triggerAtMillis - System.currentTimeMillis()
+
+        val data = Data.Builder()
+            .putString("eventTitle", "Your Event")
+            .putString("message", message)
+            .build()
+
+        val request = OneTimeWorkRequestBuilder<EventReminderWorker>()
+            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+            .setInputData(data)
+            .addTag("custom_reminder_${System.currentTimeMillis()}")
+            .build()
+
+        WorkManager.getInstance(this).enqueue(request)
+
+        Toast.makeText(this, "Reminder set!", Toast.LENGTH_SHORT).show()
     }
 }
