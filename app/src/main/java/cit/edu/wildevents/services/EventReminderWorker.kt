@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -11,10 +12,12 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import cit.edu.wildevents.R
 import cit.edu.wildevents.app.MyApplication
 import cit.edu.wildevents.data.NotificationData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
 
 class EventReminderWorker(
     context: Context,
@@ -57,6 +60,8 @@ class EventReminderWorker(
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.drawable.main_logo)
+            .setLargeIcon(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.main_logo))
 
         // --- Check permission before notifying ---
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

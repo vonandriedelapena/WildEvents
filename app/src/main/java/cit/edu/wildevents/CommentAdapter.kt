@@ -40,7 +40,7 @@ class CommentAdapter(
             }
 
             itemView.setOnLongClickListener {
-                val canModify = (comment.userId == currentUserId || isHost) && comment.eventId == currentEventId
+                val canModify = (comment.userId == currentUserId) && comment.eventId == currentEventId
                 if (canModify) {
                     AlertDialog.Builder(itemView.context)
                         .setTitle("Manage Comment")
