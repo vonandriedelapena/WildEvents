@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,16 +23,18 @@ class MessagesFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_messages, container, false)
-
         val recyclerView = view.findViewById<RecyclerView>(R.id.messages_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        notificationsAdapter = NotificationsAdapter()
+
+        notificationsAdapter = NotificationsAdapter { notification ->
+            deleteNotification(notification)
+        }
         recyclerView.adapter = notificationsAdapter
 
         loadNotifications()
-
         return view
     }
+
 
     private fun loadNotifications() {
         val userId = (requireActivity().application as MyApplication).currentUser?.id ?: return
@@ -50,5 +53,29 @@ class MessagesFragment : Fragment() {
                 Log.e("MessagesFragment", "Failed to fetch notifications", e)
             }
     }
+
+    private fun deleteNotification(notification: NotificationData) {
+        val userId = (requireActivity().application as MyApplication).currentUser?.id ?: return
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("users").document(userId).collection("notifications")
+            .whereEqualTo("timestamp", notification.timestamp)
+            .whereEqualTo("message", notification.message)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    snapshot.documents.first().reference.delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(requireContext(), "Notification deleted", Toast.LENGTH_SHORT).show()
+                            loadNotifications()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(), "Failed to delete", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+    }
+
 }
 
