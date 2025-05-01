@@ -11,6 +11,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import cit.edu.wildevents.app.MyApplication
+import cit.edu.wildevents.data.NotificationData
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class EventReminderWorker(
     context: Context,
@@ -22,6 +26,15 @@ class EventReminderWorker(
         val message = inputData.getString("message") ?: "Your event is starting soon!"
 
         showNotification(eventTitle, message)
+
+        val userId = (applicationContext as MyApplication).currentUser?.id ?: return Result.failure()
+        val db = FirebaseFirestore.getInstance()
+        val data = NotificationData(
+            title = "Event starts in 1 hour!",
+            message = "Get ready for $eventTitle",
+            eventId = db.collection("events").document().id
+        )
+        saveNotification(userId, data)
 
         return Result.success()
     }
@@ -66,5 +79,19 @@ class EventReminderWorker(
             )
         }
     }
+    private fun saveNotification(userId: String, data: NotificationData) {
+        Log.d("NotificationDebug", "Attempting to save notification for $userId")
 
+        val db = FirebaseFirestore.getInstance()
+        db.collection("users")
+            .document(userId)
+            .collection("notifications")
+            .add(data)
+            .addOnSuccessListener {
+                Log.d("NotificationDebug", "Notification saved")
+            }
+            .addOnFailureListener {
+                Log.e("NotificationDebug", "Error saving notification", it)
+            }
+    }
 }

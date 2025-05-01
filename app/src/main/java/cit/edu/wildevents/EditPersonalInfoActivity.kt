@@ -1,34 +1,39 @@
 package cit.edu.wildevents
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 
-class EditPersonalInfoActivity : AppCompatActivity() {
+class EditPersonalInfoDialogFragment(
+    private val title: String,
+    private val currentValue: String,
+    private val onSave: (String) -> Unit
+) : DialogFragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_personal_info)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireContext())
+        val view = LayoutInflater.from(context).inflate(R.layout.dialog_edit_info, null)
+        val editText = view.findViewById<EditText>(R.id.edit_text)
+        editText.setText(currentValue)
 
-        val title = intent.getStringExtra("title") ?: return
-        val value = intent.getStringExtra("value") ?: ""
-
-        val editText = findViewById<EditText>(R.id.edit_text)
-        editText.setText(value)
-
-        val saveButton = findViewById<Button>(R.id.save_button)
-        saveButton.setOnClickListener {
-            val newValue = editText.text.toString()
-
-            val resultIntent = Intent().apply {
-                putExtra("title", title)
-                putExtra("value", newValue)
+        builder.setTitle("Edit $title")
+            .setView(view)
+            .setPositiveButton("Save") { _, _ ->
+                val newValue = editText.text.toString()
+                onSave(newValue)
             }
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish()
-        }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        return builder.create()
     }
 }
+

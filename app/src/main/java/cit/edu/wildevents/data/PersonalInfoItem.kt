@@ -1,4 +1,4 @@
-package cit.edu.wildevents
+package cit.edu.wildevents.data
 
 data class PersonalInfoItem(
     val title: String,
