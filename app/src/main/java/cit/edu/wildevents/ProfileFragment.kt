@@ -7,7 +7,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import cit.edu.wildevents.app.MyApplication
+import com.bumptech.glide.Glide
 
 class ProfileFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -16,6 +21,9 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.findViewById<TextView>(R.id.username).text =
+            (requireContext().applicationContext as MyApplication).currentUser?.firstName
+
 
         val personalInfo = view.findViewById<View>(R.id.personal_info)
         personalInfo?.setOnClickListener {
@@ -41,6 +49,27 @@ class ProfileFragment : Fragment() {
         val logoutButton = view.findViewById<View>(R.id.logout_button)
         logoutButton?.setOnClickListener {
             showLogoutConfirmation()
+        }
+
+        val promoBtn = view.findViewById<LinearLayout>(R.id.promo_button)
+        promoBtn?.setOnClickListener {
+            Log.d("ProfileFragment", "Promo Button Clicked")
+            val intent = Intent(requireActivity(), CreateEventActivity::class.java)
+            startActivity(intent)
+        }
+
+        val profileImage = view.findViewById<ImageView>(R.id.profile_image)
+        val imageUrl = (requireContext().applicationContext as MyApplication).currentUser?.profilePic
+
+        if (!imageUrl.isNullOrEmpty() && imageUrl != "default.png") {
+            Glide.with(this) // or `Glide.with(requireContext())`
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_add) // optional error fallback
+                .circleCrop()
+                .into(profileImage)
+        } else {
+            profileImage.setImageResource(R.drawable.ic_placeholder)
         }
     }
 

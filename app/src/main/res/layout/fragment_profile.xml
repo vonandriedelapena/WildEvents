@@ -39,13 +39,13 @@
                     android:textStyle="bold"
                     android:textColor="@color/black"
                     />
-                <ImageView
+                <!--<ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:src="@drawable/ic_bell"
                     app:tint="@android:color/darker_gray"
                     android:layout_gravity="center_vertical"
-                    />
+                    />-->
             </LinearLayout>
 
             <!-- Profile Section -->
@@ -67,6 +67,7 @@
                     >
 
                     <ImageView
+                        android:id="@+id/profile_image"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:src="@drawable/ic_placeholder"
@@ -82,6 +83,7 @@
                         >
 
                         <TextView
+                            android:id="@+id/username"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Username"
@@ -133,10 +135,13 @@
                     app:cardUseCompatPadding="true">
 
                     <LinearLayout
+                        android:id="@+id/promo_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:padding="12dp">
 
                         <ImageView
@@ -206,12 +211,12 @@
                     android:id="@+id/personal_info"
                     android:text="@string/Personal_Information"
                     />
-                <include layout="@layout/settings_button_login_and_security_" android:id="@+id/login_security" android:text="Login and security"/>
+                <!--<include layout="@layout/settings_button_login_and_security_" android:id="@+id/login_security" android:text="Login and security"/>
                 <include layout="@layout/settings_button_payment_and_payouts" android:id="@+id/payments_payouts" android:text="Payments and payouts"/>
                 <include layout="@layout/settings_button_accessibility" android:id="@+id/accessibility" android:text="Accessibility"/>
                 <include layout="@layout/settings_button_translation" android:id="@+id/taxes" android:text="Taxes"/>
                 <include layout="@layout/settings_button_notifications" android:id="@+id/translation" android:text="Translation"/>
-                <include layout="@layout/settings_button_privacy_and_sharing" android:id="@+id/notifications" android:text="Notifications"/>
+                <include layout="@layout/settings_button_privacy_and_sharing" android:id="@+id/notifications" android:text="Notifications"/>-->
                 <include layout="@layout/settings_button_about_developers" android:id="@+id/about_developers"/>
                 <include layout="@layout/settings_button_logout" android:id="@+id/logout_button"/>
             </LinearLayout>
