@@ -54,8 +54,18 @@ class ProfileFragment : Fragment() {
         val promoBtn = view.findViewById<LinearLayout>(R.id.promo_button)
         promoBtn?.setOnClickListener {
             Log.d("ProfileFragment", "Promo Button Clicked")
-            val intent = Intent(requireActivity(), CreateEventActivity::class.java)
-            startActivity(intent)
+
+            if((requireContext().applicationContext as MyApplication).currentUser?.isHost == true) {
+                val intent = Intent(requireActivity(), CreateEventActivity::class.java)
+                startActivity(intent)
+            } else {
+                // Show a message or handle the case when the user is not an event creator
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Event Creator Required")
+                    .setMessage("You need to be an event creator to access this feature.")
+                    .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                    .show()
+            }
         }
 
         val profileImage = view.findViewById<ImageView>(R.id.profile_image)
