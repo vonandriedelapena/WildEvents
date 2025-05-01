@@ -70,7 +70,10 @@ class CreateEventActivity : AppCompatActivity() {
         setContentView(R.layout.activity_create_eventdesign)
 
         setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_back_arrow_black)
+        }
 
         coverImage = findViewById(R.id.coverImage)
         pickImagesBtn = findViewById(R.id.pickImagesBtn)
@@ -237,9 +240,15 @@ class CreateEventActivity : AppCompatActivity() {
                 hint = "Enter max capacity"
             }
 
+            val container = FrameLayout(this).apply {
+                val padding = (20 * resources.displayMetrics.density).toInt()
+                setPadding(padding, padding, padding, padding)
+                addView(input)
+            }
+
             val dialog = AlertDialog.Builder(this)
                 .setTitle("Set Capacity")
-                .setView(input)
+                .setView(container)
                 .setPositiveButton("Set") { _, _ ->
                     val text = input.text.toString()
                     if (text.isNotEmpty()) {

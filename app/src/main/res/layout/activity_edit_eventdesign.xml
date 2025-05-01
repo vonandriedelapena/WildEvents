@@ -147,7 +147,7 @@
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@drawable/ic_location"
+                    android:src="@drawable/location"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="10dp"/>
 

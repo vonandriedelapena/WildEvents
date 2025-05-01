@@ -79,6 +79,8 @@ class EventDetailActivity : AppCompatActivity() {
             showReminderPicker() // Function to let user pick when to be reminded
         }
 
+        setupToolbar()
+
     }
 
     private fun initViews() {
@@ -97,7 +99,10 @@ class EventDetailActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         setSupportActionBar(findViewById(R.id.toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_back_arrow)
+        }
     }
 
     private fun setupEditEventLauncher() {

@@ -4,6 +4,8 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Build
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,6 +18,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 
 class MainActivity : AppCompatActivity() {
@@ -88,6 +91,12 @@ class MainActivity : AppCompatActivity() {
         val newTag = newSelectedButton.tag as String
         val filledResId = getDrawableIdForTag(newTag, filled = true)
         newSelectedButton.setImageResource(filledResId)
+        newSelectedButton.setColorFilter(Color.parseColor("#333333"))
+
+        ImageViewCompat.setImageTintList(
+            newSelectedButton,
+            ColorStateList.valueOf(Color.parseColor("#333333"))
+        )
 
         // Update state
         previouslySelectedButton = newSelectedButton
