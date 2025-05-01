@@ -30,8 +30,8 @@ class EventReminderWorker(
         val userId = (applicationContext as MyApplication).currentUser?.id ?: return Result.failure()
         val db = FirebaseFirestore.getInstance()
         val data = NotificationData(
-            title = "Event starts in 1 hour!",
-            message = "Get ready for $eventTitle",
+            title = eventTitle,
+            message = message,
             eventId = db.collection("events").document().id
         )
         saveNotification(userId, data)

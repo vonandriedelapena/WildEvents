@@ -605,7 +605,7 @@ class EventDetailActivity : AppCompatActivity() {
         val delay = triggerAtMillis - System.currentTimeMillis()
 
         val data = Data.Builder()
-            .putString("eventTitle", "Your Event")
+            .putString("eventTitle", titleTextView.text.toString())
             .putString("message", message)
             .build()
 
