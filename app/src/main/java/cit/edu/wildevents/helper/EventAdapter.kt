@@ -4,15 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.view.*
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
@@ -86,15 +79,38 @@ class EventAdapter(private val context: Context) :
 
         if (currentUser != null) {
             if (currentUser.isHost && currentUser.id == event.hostId) {
-                // Host user, show Edit Event
+                // Host user: Edit button + Long press to delete
                 setButtonToEdit(holder)
                 holder.joinButton.setOnClickListener {
                     val intent = Intent(context, cit.edu.wildevents.EditEventActivity::class.java)
                     intent.putExtra("eventId", event.eventId)
                     context.startActivity(intent)
                 }
+
+                // Long-press to delete
+                holder.itemView.setOnLongClickListener {
+                    AlertDialog.Builder(context)
+                        .setTitle("Delete Event")
+                        .setMessage("Are you sure you want to delete this event?")
+                        .setPositiveButton("Yes") { _, _ ->
+                            db.collection("events")
+                                .document(event.eventId)
+                                .delete()
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Event deleted", Toast.LENGTH_SHORT).show()
+                                    updateEvents(events.filterNot { it.eventId == event.eventId })
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "Failed to delete event", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                    true
+                }
+
             } else {
-                // Not host, check if already RSVP'd
+                // Not host, check RSVP
                 db.collection("attendee")
                     .whereEqualTo("eventId", event.eventId)
                     .whereEqualTo("userId", currentUser.id)
@@ -105,7 +121,6 @@ class EventAdapter(private val context: Context) :
                             setButtonToGoing(holder)
 
                             holder.joinButton.setOnClickListener {
-                                // Confirm leaving event
                                 AlertDialog.Builder(context)
                                     .setTitle("Cancel RSVP")
                                     .setMessage("Should I cancel your RSVP?")
@@ -125,9 +140,7 @@ class EventAdapter(private val context: Context) :
                                     .show()
                             }
                         } else {
-                            // Not joined yet
                             setButtonToJoin(holder)
-
                             holder.joinButton.setOnClickListener {
                                 val attendeeData = mapOf(
                                     "eventId" to event.eventId,
@@ -148,7 +161,7 @@ class EventAdapter(private val context: Context) :
             }
         }
 
-        // Open Event Details when clicking the whole card
+        // Open Event Details
         holder.itemView.setOnClickListener {
             val intent = Intent(context, EventDetailActivity::class.java).apply {
                 putExtra("eventId", event.eventId)
@@ -166,8 +179,6 @@ class EventAdapter(private val context: Context) :
         }
     }
 
-
-
     override fun getItemCount(): Int = events.size
 
     private fun displayAttendees(
@@ -176,20 +187,16 @@ class EventAdapter(private val context: Context) :
         totalCount: Int
     ) {
         attendeesLayout.removeAllViews()
-
         val maxVisiblePfps = 3
         val imageSize = 80
         val overlapMargin = -30
 
         val actualCount = profilePics.size
-
         for ((index, picUrl) in profilePics.withIndex()) {
             if (index < maxVisiblePfps) {
                 val imageView = ImageView(context).apply {
                     layoutParams = LinearLayout.LayoutParams(imageSize, imageSize).apply {
-                        if (index != 0) {
-                            marginStart = overlapMargin
-                        }
+                        if (index != 0) marginStart = overlapMargin
                         setPadding(4)
                     }
                     scaleType = ImageView.ScaleType.CENTER_CROP
@@ -207,7 +214,6 @@ class EventAdapter(private val context: Context) :
             }
         }
 
-        // 👉 Only add "+N" if there are **more** attendees than max visible
         if (actualCount > maxVisiblePfps) {
             val remainingCount = totalCount - maxVisiblePfps
             if (remainingCount > 0) {
@@ -217,7 +223,7 @@ class EventAdapter(private val context: Context) :
                     }
                     text = "+$remainingCount"
                     gravity = Gravity.CENTER
-                    background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border) // better visibility
+                    background = ContextCompat.getDrawable(context, R.drawable.circle_black_with_white_border)
                     setTextColor(Color.WHITE)
                     textSize = 14f
                     setTypeface(null, Typeface.BOLD)
@@ -242,5 +248,4 @@ class EventAdapter(private val context: Context) :
         holder.joinButton.text = "Edit Event"
         holder.joinButton.setBackgroundColor(Color.parseColor("#D4AF37"))
     }
-
 }

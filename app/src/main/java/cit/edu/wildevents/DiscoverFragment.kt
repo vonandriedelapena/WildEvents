@@ -19,17 +19,12 @@ import cit.edu.wildevents.data.TimeFilterMode
 import cit.edu.wildevents.helper.EventsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-/**
- * The app uses fragments to display different screens while maintaining a navigation bar static at the bottom.
- * This fragment displays a list of events for the users using a Custom ListView
- */
 class DiscoverFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: EventAdapter
     private lateinit var viewModel: EventsViewModel
     private lateinit var searchBar: EditText
-
     private var selectedCategory: String? = null
 
     override fun onCreateView(
@@ -51,23 +46,18 @@ class DiscoverFragment : Fragment() {
         }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = EventAdapter(requireContext())
-        recyclerView.adapter = adapter
 
         viewModel = ViewModelProvider(requireActivity())[EventsViewModel::class.java]
         viewModel.setTimeFilterMode(TimeFilterMode.UPCOMING)
 
-        // Observe event list
+        // Adapter does not need refresh callback anymore
+        adapter = EventAdapter(requireContext())
+        recyclerView.adapter = adapter
+
         viewModel.events.observe(viewLifecycleOwner) { updatedEvents ->
             adapter.updateEvents(updatedEvents)
-
-            // ✅ Force filter after first observation
-            if (updatedEvents.isEmpty()) {
-                viewModel.filterEvents(searchBar.text.toString(), selectedCategory)
-            }
         }
 
-        // Search bar listener
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 viewModel.filterEvents(s.toString(), selectedCategory)
@@ -77,7 +67,6 @@ class DiscoverFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // Category button listeners
         val categoryIds = listOf(
             R.id.button_general,
             R.id.button_engr,
@@ -101,7 +90,6 @@ class DiscoverFragment : Fragment() {
                 selectedCategory = category
                 viewModel.filterEvents(searchBar.text.toString(), selectedCategory)
 
-                // Reset all buttons
                 categoryIds.forEach { resetId ->
                     val resetButton = view.findViewById<Button>(resetId)
                     resetButton.setBackgroundResource(R.drawable.category_background)
@@ -109,14 +97,12 @@ class DiscoverFragment : Fragment() {
                     resetButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 }
 
-                // Highlight selected button
                 button.setBackgroundResource(R.drawable.category_background)
                 button.backgroundTintList = ColorStateList.valueOf(selectedColor)
-                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                button.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             }
         }
 
-// Set default category to "General"
         val defaultCategory = "General"
         selectedCategory = defaultCategory
         categoryButtons[defaultCategory]?.performClick()
