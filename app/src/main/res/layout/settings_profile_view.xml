@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -189,10 +190,10 @@
                             android:layout_marginBottom="4dp" />
 
                         <TextView
-                            android:id="@+id/years_label"
+                            android:id="@+id/events_joined_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Years on WildEvents"
+                            android:text="Events Joined"
                             android:textSize="14sp"
                             android:textColor="@android:color/darker_gray"
                             app:layout_constraintTop_toBottomOf="@id/years_count"
@@ -300,6 +301,7 @@
                         app:tint="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/profile_id"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -308,14 +310,6 @@
                         android:textSize="13sp"
                         android:textColor="@android:color/black" />
                 </LinearLayout>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="This is where the bio goes"
-                    android:layout_marginHorizontal="6dp"
-                    android:layout_marginTop="20dp"
-                    android:textSize="12sp"
-                    android:layout_below="@id/address"/>
             </RelativeLayout>
 
 

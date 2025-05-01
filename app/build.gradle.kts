@@ -74,6 +74,7 @@ dependencies {
     implementation ("com.cloudinary:cloudinary-android:2.3.1")
     implementation ("androidx.work:work-runtime-ktx:2.9.0")
     implementation ("com.google.firebase:firebase-messaging:24.1.1")
+    implementation ("com.google.firebase:firebase-auth:22.3.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

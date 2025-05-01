@@ -1,6 +1,7 @@
 package cit.edu.wildevents
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -23,13 +24,18 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.setPadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import cit.edu.wildevents.app.MyApplication
 import com.google.firebase.firestore.FieldPath
 import cit.edu.wildevents.data.Comment
 import cit.edu.wildevents.data.User
+import cit.edu.wildevents.services.EventReminderWorker
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import java.util.concurrent.TimeUnit
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -109,6 +115,13 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     private fun loadUpdatedEventDetails(eventName: String?, description: String?, startTime: Long, endTime: Long, location: String?, imageUrl: String?) {
+        // Schedule reminders for the updated event
+        scheduleEventReminders(
+            context = this,
+            eventTitle = eventName ?: "Event",
+            eventTimeInMillis = startTime
+        )
+
         titleTextView.text = eventName
         descriptionTextView.text = description
         locationTextView.text = location
@@ -298,6 +311,13 @@ class EventDetailActivity : AppCompatActivity() {
                     attendeeDocId = docRef.id
                     Toast.makeText(this, "You joined the event!", Toast.LENGTH_SHORT).show()
                     setButtonToGoing()
+
+                    // Schedule reminders for the event
+                    scheduleEventReminders(
+                        context = this,
+                        eventTitle = titleTextView.text.toString(),
+                        eventTimeInMillis = intent.getLongExtra("startTime", -1L)
+                    )
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "Failed to join event.", Toast.LENGTH_SHORT).show()
@@ -314,6 +334,8 @@ class EventDetailActivity : AppCompatActivity() {
                             attendeeDocId = null
                             Toast.makeText(this, "You left the event.", Toast.LENGTH_SHORT).show()
                             setButtonToJoin()
+
+                            WorkManager.getInstance(this).cancelAllWorkByTag(eventId!!)
                         }
                         .addOnFailureListener {
                             Toast.makeText(this, "Failed to leave event.", Toast.LENGTH_SHORT).show()
@@ -462,7 +484,44 @@ class EventDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun scheduleEventReminders(
+        context: Context,
+        eventTitle: String,
+        eventTimeInMillis: Long
+    ) {
+        val workManager = WorkManager.getInstance(context)
 
+        // --- Helper Function ---
+        fun scheduleReminder(delayMillis: Long, message: String) {
+            val data = Data.Builder()
+                .putString("eventTitle", eventTitle)
+                .putString("message", message)
+                .build()
 
+            val workRequest = OneTimeWorkRequestBuilder<EventReminderWorker>()
+                .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+                .setInputData(data)
+                .addTag(eventId!!)
+                .build()
 
+            workManager.enqueue(workRequest)
+        }
+
+        val now = System.currentTimeMillis()
+
+        val timeUntilEvent = eventTimeInMillis - now
+
+        if (timeUntilEvent > 0) {
+            if (timeUntilEvent > 7 * 24 * 60 * 60 * 1000) { // More than a week left
+                scheduleReminder(timeUntilEvent - 7 * 24 * 60 * 60 * 1000, "Your event '$eventTitle' is 1 week away!")
+            }
+            if (timeUntilEvent > 24 * 60 * 60 * 1000) { // More than a day left
+                scheduleReminder(timeUntilEvent - 24 * 60 * 60 * 1000, "Reminder: '$eventTitle' is tomorrow!")
+            }
+            if (timeUntilEvent > 60 * 60 * 1000) { // More than an hour left
+                scheduleReminder(timeUntilEvent - 60 * 60 * 1000, "Get ready! '$eventTitle' is starting in 1 hour.")
+                Log.d("Reminders", "Reminder set for 1 hour before the event.")
+            }
+        }
+    }
 }

@@ -1,86 +1,94 @@
 package cit.edu.wildevents
 
-import android.app.Activity
-import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cit.edu.wildevents.app.MyApplication
+import cit.edu.wildevents.data.PersonalInfoItem
+import cit.edu.wildevents.data.User
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SettingsPersonalInformation : AppCompatActivity() {
 
-    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var adapter: PersonalInfoAdapter
     private var items = mutableListOf<PersonalInfoItem>()
-
-    // Register an ActivityResultLauncher to handle the edited data
-    private val editInfoLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val updatedTitle = result.data?.getStringExtra("title") ?: return@registerForActivityResult
-                val updatedValue = result.data?.getStringExtra("value") ?: return@registerForActivityResult
-
-                // Update SharedPreferences
-                with(sharedPreferences.edit()) {
-                    when (updatedTitle) {
-                        "Legal name" -> putString("firstName", updatedValue.split(" ")[0])
-                        "Preferred first name" -> putString("firstName", updatedValue)
-                        "Phone number" -> putString("phoneNumber", updatedValue)
-                        "Email" -> putString("email", updatedValue)
-                        "Address" -> putString("address", updatedValue)
-                        "Emergency contact" -> putString("emergencyContact", updatedValue)
-                    }
-                    apply()
-                }
-
-                // Update the list and refresh RecyclerView
-                items.find { it.title == updatedTitle }?.let { it.value = updatedValue }
-                adapter.notifyDataSetChanged()
-            }
-        }
+    private lateinit var currentUser: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_personal_information)
 
-        sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
+        currentUser = (application as MyApplication).currentUser ?: return
+        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
 
-        // Load stored user info
-        val firstName = sharedPreferences.getString("firstName", "Not provided") ?: "Not provided"
-        val lastName = sharedPreferences.getString("lastName", "Not provided") ?: "Not provided"
-        val email = sharedPreferences.getString("email", "Not provided") ?: "Not provided"
-        val phoneNumber = sharedPreferences.getString("phoneNumber", "Not provided") ?: "Not provided"
-        val address = sharedPreferences.getString("address", "Not provided") ?: "Not provided"
-        val emergencyContact = sharedPreferences.getString("emergencyContact", "Not provided") ?: "Not provided"
-        val isVerified = sharedPreferences.getBoolean("isVerified", false)
-
+        // Initialize the list with user data
         items = mutableListOf(
-            PersonalInfoItem("Legal name", "$firstName $lastName", true),
-            PersonalInfoItem("Preferred first name", firstName, true),
-            PersonalInfoItem("Phone number", phoneNumber, true),
-            PersonalInfoItem("Email", email, false), // Email might not be editable
-            PersonalInfoItem("Address", address, true),
-            PersonalInfoItem("Emergency contact", emergencyContact, true),
-            PersonalInfoItem("Identity verification", if (isVerified) "Verified" else "Not Verified", false)
+            PersonalInfoItem("Legal name", "${currentUser.firstName} ${currentUser.lastName}", true),
+            PersonalInfoItem("Preferred first name", currentUser.firstName, true),
+            PersonalInfoItem("Phone number", currentUser.phoneNumber, true),
+            PersonalInfoItem("Email", currentUser.email, false),
+            PersonalInfoItem("Address", currentUser.address, true),
+            PersonalInfoItem("Emergency contact", currentUser.emergencyContact, true)
         )
 
-        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        // Set up RecyclerView
         adapter = PersonalInfoAdapter(items) { item ->
-            val intent = Intent(this, EditPersonalInfoActivity::class.java).apply {
-                putExtra("title", item.title)
-                putExtra("value", item.value)
+            val dialog = EditPersonalInfoDialogFragment(item.title, item.value) { newValue ->
+                updateUserField(item.title, newValue)
             }
-            editInfoLauncher.launch(intent)
+            dialog.show(supportFragmentManager, "EditDialog")
         }
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+        recyclerView.setHasFixedSize(true)
+        recyclerView.setItemViewCacheSize(20)
 
         val goToMainActivity = findViewById<ImageView>(R.id.back_button)
         goToMainActivity.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    private fun updateUserField(title: String, newValue: String) {
+        val user = (application as MyApplication).currentUser ?: return
+        val userRef = FirebaseFirestore.getInstance().collection("users").document(user.id)
+
+        when (title) {
+            "Legal name" -> {
+                val (first, last) = newValue.split(" ", limit = 2) + listOf("")
+                userRef.update(mapOf("firstName" to first, "lastName" to last))
+                user.firstName = first
+                user.lastName = last
+            }
+            "Preferred first name" -> {
+                userRef.update("firstName", newValue)
+                user.firstName = newValue
+            }
+            "Phone number" -> {
+                userRef.update("phoneNumber", newValue)
+                user.phoneNumber = newValue
+            }
+            "Email" -> {
+                userRef.update("email", newValue)
+                user.email = newValue
+            }
+            "Address" -> {
+                userRef.update("address", newValue)
+                user.address = newValue
+            }
+            "Emergency contact" -> {
+                userRef.update("emergencyContact", newValue)
+                user.emergencyContact = newValue
+            }
+        }
+
+        // Update the RecyclerView item
+        items.find { it.title == title }?.let {
+            it.value = newValue
+            adapter.notifyDataSetChanged()
         }
     }
 }

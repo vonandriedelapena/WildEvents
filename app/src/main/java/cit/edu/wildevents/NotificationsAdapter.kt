@@ -7,11 +7,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import cit.edu.wildevents.data.NotificationData
+import java.text.DateFormat
 
-class NotificationsAdapter : ListAdapter<Notification, NotificationsAdapter.NotificationViewHolder>(DiffCallback()) {
+class NotificationsAdapter :
+    ListAdapter<NotificationData, NotificationsAdapter.NotificationViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotificationViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_notification, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_notification, parent, false)
         return NotificationViewHolder(view)
     }
 
@@ -22,15 +26,22 @@ class NotificationsAdapter : ListAdapter<Notification, NotificationsAdapter.Noti
     class NotificationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val titleTextView: TextView = itemView.findViewById(R.id.notification_title)
         private val messageTextView: TextView = itemView.findViewById(R.id.notification_message)
+        private val timeTextView: TextView = itemView.findViewById(R.id.notification_time)
 
-        fun bind(notification: Notification) {
+        fun bind(notification: NotificationData) {
             titleTextView.text = notification.title
             messageTextView.text = notification.message
+            timeTextView.text = DateFormat.getDateTimeInstance().format(notification.timestamp.toDate())
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Notification>() {
-        override fun areItemsTheSame(oldItem: Notification, newItem: Notification): Boolean = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: Notification, newItem: Notification): Boolean = oldItem == newItem
+    class DiffCallback : DiffUtil.ItemCallback<NotificationData>() {
+        override fun areItemsTheSame(oldItem: NotificationData, newItem: NotificationData): Boolean {
+            return oldItem.timestamp == newItem.timestamp && oldItem.message == newItem.message
+        }
+
+        override fun areContentsTheSame(oldItem: NotificationData, newItem: NotificationData): Boolean {
+            return oldItem == newItem
+        }
     }
 }
