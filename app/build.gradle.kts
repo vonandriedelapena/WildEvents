@@ -75,6 +75,8 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.9.0")
     implementation ("com.google.firebase:firebase-messaging:24.1.1")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation ("androidx.work:work-runtime-ktx:2.9.0")
+    implementation ("androidx.core:core-ktx:1.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

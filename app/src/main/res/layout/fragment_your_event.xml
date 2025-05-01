@@ -19,15 +19,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:textSize="24dp"
             android:text="Events"
             android:textStyle="bold"
             android:textColor="@color/black"
             />
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_marginTop="3dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_down"
             android:layout_marginLeft="10dp"
             android:clickable="true"
@@ -37,17 +38,15 @@
 
 
 
-
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="14dp">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="14dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -56,7 +55,7 @@
 
                 <LinearLayout
                     android:id="@+id/eventFilterDropdown"
-                    android:layout_width="150dp"
+                    android:layout_width="140dp"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:padding="12dp"
@@ -98,7 +97,7 @@
                     android:background="@drawable/rounded_image"
                     android:gravity="center_vertical|end"
                     android:layout_marginEnd="10dp"
-                    android:layout_marginStart="40dp"
+                    android:layout_marginStart="30dp"
                     android:layout_marginTop="8dp"
                     android:clickable="true"
                     android:focusable="true"
@@ -142,10 +141,10 @@
                     android:background="@drawable/rounded_image"
                     android:elevation="8dp"
                     android:clipToOutline="true"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="16dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="16dp"
                     />
 
             </LinearLayout>
@@ -157,7 +156,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:nestedScrollingEnabled="false"
-                android:padding="4dp"/>
+                android:padding="2dp"/>
 
         </LinearLayout>
 

@@ -57,67 +57,78 @@ category buttons, and a list of events -->
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_general"
                         android:layout_width="wrap_content"
-                        android:layout_height="50dp"
+                        android:layout_height="45dp"
                         android:text="General"
                         android:tag="General"
                         android:background="@drawable/category_background"
-                        android:backgroundTint="#303030"
+                        android:backgroundTint="#89333b"
                         android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_engr"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
                         android:text="ENGR"
                         android:tag="ENGR"
                         android:background="@drawable/category_background"
+                        android:backgroundTint="#89333b"
                         android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_arch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
                         android:text="ARCH"
                         android:tag="ARCH"
                         android:background="@drawable/category_background"
+                        android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_cnahs"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
                         android:text="CNAHS"
                         android:tag="CNAHS"
                         android:background="@drawable/category_background"
+                        android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_ccs"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
                         android:text="CCS"
                         android:tag="CCS"
                         android:background="@drawable/category_background"
+                        android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_crim"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
                         android:text="CRIM"
                         android:tag="CRIM"
                         android:background="@drawable/category_background"
+                        android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/button_cmba"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
                         android:text="CMBA"
                         android:tag="CMBA"
                         android:background="@drawable/category_background"
+                        android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
                 </LinearLayout>
@@ -128,19 +139,20 @@ category buttons, and a list of events -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="24dp"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
             android:layout_below="@id/top_section">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/events_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingTop="24dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
                 android:clipToPadding="false"
-                android:padding="0dp"
-                android:scrollbars="vertical" />
+                android:scrollbars="vertical"
+                android:scrollbarStyle="outsideOverlay"/>
         </RelativeLayout>
+
 
     </RelativeLayout>
 

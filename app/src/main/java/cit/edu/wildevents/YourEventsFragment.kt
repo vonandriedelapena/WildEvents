@@ -66,10 +66,13 @@ class YourEventsFragment : Fragment() {
         viewModel.setTimeFilterMode(TimeFilterMode.UPCOMING)
 
         calendarBtn.setOnClickListener {
-            calendarLayout.visibility =
-                if (calendarLayout.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            val isVisible = calendarLayout.visibility == View.VISIBLE
+            calendarLayout.visibility = if (isVisible) View.GONE else View.VISIBLE
 
-            if (calendarLayout.visibility == View.GONE) {
+            if (!isVisible) {
+                calendarBtn.scaleY = -1f  // Flip when showing
+            } else {
+                calendarBtn.scaleY = 1f   // Reset when hiding
                 applyCombinedFilter()
             }
         }

@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.InputType
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -83,6 +84,9 @@ class CreateEventActivity : AppCompatActivity() {
         eventCapacityText = findViewById(R.id.eventCapacity)
         requireApprovalSwitch = findViewById(R.id.requireApprovalSwitch)
         createEventBtn = findViewById(R.id.createEventBtn)
+
+        val descriptionInput = findViewById<EditText>(R.id.eventDescriptionInput)
+        descriptionInput.setMovementMethod(ScrollingMovementMethod())
 
         imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK && result.data != null) {
@@ -177,12 +181,19 @@ class CreateEventActivity : AppCompatActivity() {
         btnPickEndTime.setOnClickListener {
             val now = Calendar.getInstance()
             TimePickerDialog(this, { _, hour, minute ->
-                endTime = Calendar.getInstance().apply {
+                val pickedEndTime = Calendar.getInstance().apply {
                     set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH), hour, minute)
                 }
-                tvEnd.text = timeFormat.format(endTime!!.time)
+
+                if (startTime != null && pickedEndTime.before(startTime)) {
+                    Toast.makeText(this, "End time cannot be before start time", Toast.LENGTH_SHORT).show()
+                } else {
+                    endTime = pickedEndTime
+                    tvEnd.text = timeFormat.format(endTime!!.time)
+                }
             }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), false).show()
         }
+
 
         btnCancel.setOnClickListener {
             dialog.dismiss()

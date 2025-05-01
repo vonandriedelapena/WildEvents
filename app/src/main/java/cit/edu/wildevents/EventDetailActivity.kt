@@ -58,7 +58,6 @@ class EventDetailActivity : AppCompatActivity() {
         setContentView(R.layout.event_details)
 
         initViews()
-        setupToolbar()
 
         eventId = intent.getStringExtra("eventId")
         currentUser = (application as MyApplication).currentUser
@@ -355,6 +354,8 @@ class EventDetailActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "Comment posted!", Toast.LENGTH_SHORT).show()
                     loadCommentsForEvent(eventId)
+                    val commentInput = findViewById<EditText>(R.id.comment_input)
+                    commentInput.text.clear()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Failed to post comment: ${e.message}", Toast.LENGTH_SHORT).show()
