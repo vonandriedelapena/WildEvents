@@ -358,13 +358,13 @@ class EventDetailActivity : AppCompatActivity() {
     }
 
     private fun setupCommentsSection() {
-        val isHost = currentUser?.isHost ?: false
+        val eventHostId = intent.getStringExtra("hostId") ?: ""
 
         commentAdapter = CommentAdapter(
             comments = mutableListOf(),
             currentUserId = currentUser!!.id,
             currentEventId = eventId!!,
-            isHost = isHost,
+            eventHostId = eventHostId,
             onDeleteComment = { comment ->
                 FirebaseFirestore.getInstance()
                     .collection("comments")
@@ -394,6 +394,7 @@ class EventDetailActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun showEditCommentDialog(comment: Comment) {
         val editText = EditText(this)
         editText.setText(comment.content)

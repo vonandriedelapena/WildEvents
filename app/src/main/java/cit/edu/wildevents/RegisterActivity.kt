@@ -134,7 +134,7 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             if (isHost == null) {
-                toast("Please select either Host or Student")
+                toast("Please select either Host or Participant")
                 return@setOnClickListener
             }
 

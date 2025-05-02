@@ -132,6 +132,17 @@ category buttons, and a list of events -->
                         android:textColor="@color/white"
                         android:layout_marginEnd="10dp" />
 
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/button_case"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:backgroundTint="#89333b"
+                        android:text="CASE"
+                        android:tag="CASE"
+                        android:background="@drawable/category_background"
+                        android:textColor="@color/white"
+                        android:layout_marginEnd="10dp" />
+
                 </LinearLayout>
             </HorizontalScrollView>
 

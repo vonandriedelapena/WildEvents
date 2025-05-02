@@ -75,6 +75,7 @@ class DiscoverFragment : Fragment() {
             R.id.button_ccs,
             R.id.button_crim,
             R.id.button_cmba,
+            R.id.button_case
         )
 
         val defaultColor = ContextCompat.getColor(requireContext(), R.color.maroon)

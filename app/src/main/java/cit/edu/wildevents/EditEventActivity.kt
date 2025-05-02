@@ -49,7 +49,7 @@ class EditEventActivity : AppCompatActivity() {
     private var endTime: Calendar? = null
     private var capacity: Int? = null
 
-    private val predefinedTags = listOf("General", "Engr", "Arch", "Cnahs", "CCS", "Crim", "Cmba")
+    private val predefinedTags = listOf("General", "Engr", "Arch", "Cnahs", "CCS", "Crim", "Cmba", "Case")
     private val selectedTags = mutableListOf<String>()
 
     private lateinit var imagePickerLauncher: ActivityResultLauncher<Intent>

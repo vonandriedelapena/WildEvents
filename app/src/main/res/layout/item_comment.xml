@@ -19,21 +19,31 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/user_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="User Name"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:orientation="vertical"
+            android:background="@drawable/rounded_image"
+            android:backgroundTint="#ECECEC"
+            android:padding="10dp">
 
-        <TextView
-            android:id="@+id/comment_content"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Comment content goes here"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp" />
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User Name"
+                android:textStyle="bold"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/comment_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comment content goes here"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/comment_timestamp"
@@ -42,6 +52,7 @@
             android:text="12 Dec 2023, 10:00 AM"
             android:textSize="12sp"
             android:textColor="#888888"
-            android:layout_marginTop="4dp" />
+            android:layout_marginTop="4dp"
+            android:paddingLeft="10dp"/>
     </LinearLayout>
 </LinearLayout>
