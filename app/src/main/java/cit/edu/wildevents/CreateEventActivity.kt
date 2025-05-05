@@ -393,11 +393,25 @@ class CreateEventActivity : AppCompatActivity() {
             }
     }
 
-
     override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Exit Without Saving?")
+        builder.setMessage("Are you sure you want to exit? Any unsaved changes will be lost.")
+
+        builder.setPositiveButton("Yes") { _, _ ->
+            finish() // Finish the activity
+        }
+
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss() // Dismiss the dialog
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+
+        return true // Indicate that we've handled the navigation
     }
+
 
     private fun scheduleNotification(startTime: Calendar, eventName: String) {
         val intent = Intent(this, ReminderReceiver::class.java).apply {
